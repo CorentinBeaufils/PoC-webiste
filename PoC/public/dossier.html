@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ajouter un Dossier</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <nav>
+        <ul>
+            <li><a href="user.html">Mon Profil</a></li>
+            <li><a href="dossier.html">Créer un Dossier</a></li>
+            <li><a href="dossier_list.html">Voir les Dossiers</a></li>
+            <li><a href="#" id="logoutButton">Se Déconnecter</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <h2>Ajouter un Dossier</h2>
+        <form id="dossierForm">
+            <input type="text" id="nom" placeholder="Nom du dossier" required><br>
+            <textarea id="description" placeholder="Description" required></textarea><br>
+            <button type="submit">Créer Dossier</button>
+        </form>
+
+        <p id="errorMessage"></p>
+    </div>
+
+    <script src="dossier.js"></script>
+</body>
+</html>

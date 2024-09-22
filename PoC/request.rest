@@ -1,0 +1,23 @@
+post http://localhost:3100/inscription
+Content-Type: application/json
+
+
+{
+    "nom":"corentin",
+    "email":"coco@mail.com",
+    "mot_de_passe":"123456789"
+}
+
+###
+
+POST http://localhost:3100/connexion
+Content-Type: application/json
+
+
+{
+    "email":"coco@mail.com",
+    "mot_de_passe":"123456789"
+}
+
+
+

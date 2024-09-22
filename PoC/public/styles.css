@@ -1,0 +1,128 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+
+/* Fixe la barre de navigation et décale le contenu de la page */
+body {
+    margin: 0;
+    padding-top: 60px; /* Espace pour la barre de navigation */
+    background-color: #f0f0f0;
+}
+
+/* Centrage du contenu */
+.container {
+    background-color: #fff;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    max-width: 1200px;
+    margin: auto;
+}
+
+/* Style des titres */
+h2 {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* Style des boutons */
+button {
+    width: 100%;
+    padding: 10px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+button:hover {
+    background-color: #218838;
+}
+
+#errorMessage {
+    color: red;
+    margin-top: 10px;
+}
+
+/* Style de la barre de navigation */
+nav {
+    background-color: #333;
+    color: white;
+    position: fixed; /* Fixe la barre de navigation en haut de la page */
+    width: 100%;
+    top: 0;
+    left: 0;
+    padding: 10px;
+    z-index: 1000;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    justify-content: space-around;
+    margin: 0;
+    padding: 0;
+}
+
+nav ul li {
+    display: inline;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+    padding: 10px 20px;
+    display: inline-block;
+}
+
+nav ul li a:hover {
+    background-color: #575757;
+    border-radius: 5px;
+}
+
+/* Style pour la table des dossiers */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: white;
+    text-align: left;
+}
+
+th, td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #333;
+    color: white;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+tr:hover {
+    background-color: #f5f5f5;
+}
+
+td {
+    word-wrap: break-word;
+    max-width: 300px;  /* Ajuster cette valeur selon tes besoins */
+}
+
+
+/* Loader pour indiquer que les données se chargent */
+#loader {
+    display: none;  /* Masqué par défaut */
+    text-align: center;
+    margin-top: 20px;
+}
+
+#loader.active {
+    display: block;  /* Affiché quand la classe "active" est ajoutée */
+}
