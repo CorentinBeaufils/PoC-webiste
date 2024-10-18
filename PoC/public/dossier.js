@@ -8,7 +8,7 @@ document.getElementById('dossierForm').addEventListener('submit', async (e) => {
     const token = localStorage.getItem('token');
 
     try {
-        const response = await fetch('http://localhost:3100/dossiers', {
+        const response = await fetch('http://72.255.240.81:5001/dossiers', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

@@ -13,7 +13,7 @@ const chargerDossiers = async () => {
     isLoading = true;
 
     try {
-        const response = await fetch(`http://localhost:3100/dossiers?limit=${limit}&offset=${offset}`, {
+        const response = await fetch(`http://72.255.240.81:5001/dossiers?limit=${limit}&offset=${offset}`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`

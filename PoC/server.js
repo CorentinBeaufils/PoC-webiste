@@ -20,10 +20,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Connexion à la base de données MySQL
 const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
+    host: '127.0.0.1',
+    user: 'admin',
     password: '123456789',  // Remplace par le mot de passe MySQL
-    database: 'PoC'
+    database: 'PoC',
+    connectTimeout : 20000
 });
 
 
