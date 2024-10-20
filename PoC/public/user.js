@@ -6,7 +6,7 @@ if (!token) {
     window.location.href = 'login.html';
 } else {
     // Envoyer une requête GET pour accéder à la page sécurisée
-    fetch('http://72.255.240.81:5001/user.html', {
+    fetch('http://localhost:3100/user.html', {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${token}`

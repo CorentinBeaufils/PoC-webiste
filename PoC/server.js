@@ -21,7 +21,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Connexion à la base de données MySQL
 const db = mysql.createConnection({
     host: '127.0.0.1',
-    user: 'admin',
+    user: 'root',
     password: '123456789',  // Remplace par le mot de passe MySQL
     database: 'PoC',
     connectTimeout : 20000
@@ -42,36 +42,122 @@ app.listen(PORT, () => {
     console.log(`Serveur démarré sur le port ${PORT}`);
 });
 
-// Route pour l'inscription
-app.post('/inscription', async (req, res) => {
+
+
+
+const verifierAdmin = (req, res, next) => {
+    const token = req.headers['authorization'];
+    
+    if (!token) {
+        return res.status(403).json({ message: 'Token non fourni' });
+    }
+  
+    try {
+        const decoded = jwt.verify(token.split(' ')[1], process.env.ACCESS_TOKEN_SECRET);
+        if (decoded.role !== 'admin') {
+            return res.status(403).json({ message: 'Accès réservé aux administrateurs' });
+        }
+        req.utilisateur = decoded;
+        next();
+    } catch (err) {
+        return res.status(401).json({ message: 'Token invalide' });
+    }
+};
+
+// Route pour créer un utilisateur (protégée)
+app.post('/inscription', verifierAdmin, async (req, res) => {
     const { nom, email, mot_de_passe } = req.body;
 
-    // Vérifier si l'utilisateur existe déjà
-    db.query('SELECT * FROM utilisateurs WHERE email = ?', [email], async (err, results) => {
-        if (results.length > 0) {
-            return res.status(400).json({ message: 'Cet utilisateur existe déjà.' });
-        }
-        console.log('test')
-        // Hacher le mot de passe
-        const mot_de_passe_hache = await bcrypt.hash(mot_de_passe, 10);
+    const mot_de_passe_hache = await bcrypt.hash(mot_de_passe, 10);
 
-        // Insérer l'utilisateur dans la base de données
-        db.query('INSERT INTO utilisateurs (nom, email, mot_de_passe) VALUES (?, ?, ?)',
-            [nom, email, mot_de_passe_hache],
-            (err, result) => {
-                if (err) {
-                    console.error(err);
-                    return res.status(500).json({ message: 'Erreur lors de l\'inscription.' });
-                }
-                res.status(201).json({ message: 'Utilisateur inscrit avec succès.' });
-            });
-    });
+    db.query('INSERT INTO utilisateurs (nom, email, mot_de_passe) VALUES (?, ?, ?)',
+        [nom, email, mot_de_passe_hache],
+        (err, result) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).json({ message: 'Erreur lors de la création de l\'utilisateur.' });
+            }
+            res.status(201).json({ message: 'Utilisateur créé avec succès.' });
+        }
+    );
 });
 
 
 
+// Route pour supprimer un utilisateur
+app.delete('/supprimer_utilisateur', verifierAdmin, (req, res) => {
+    const { email } = req.body;
 
-// Route pour la connexion
+    db.query('DELETE FROM utilisateurs WHERE email = ?', [email], (err, result) => {
+        if (err) {
+            return res.status(500).json({ message: 'Erreur lors de la suppression de l\'utilisateur.' });
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'Utilisateur non trouvé.' });
+        }
+
+        res.status(200).json({ message: 'Utilisateur supprimé avec succès.' });
+    });
+});
+
+
+// // Route pour l'inscription
+// app.post('/inscription', async (req, res) => {
+//     const { nom, email, mot_de_passe } = req.body;
+
+//     // Vérifier si l'utilisateur existe déjà
+//     db.query('SELECT * FROM utilisateurs WHERE email = ?', [email], async (err, results) => {
+//         if (results.length > 0) {
+//             return res.status(400).json({ message: 'Cet utilisateur existe déjà.' });
+//         }
+//         console.log('test')
+//         // Hacher le mot de passe
+//         const mot_de_passe_hache = await bcrypt.hash(mot_de_passe, 10);
+
+//         // Insérer l'utilisateur dans la base de données
+//         db.query('INSERT INTO utilisateurs (nom, email, mot_de_passe) VALUES (?, ?, ?)',
+//             [nom, email, mot_de_passe_hache],
+//             (err, result) => {
+//                 if (err) {
+//                     console.error(err);
+//                     return res.status(500).json({ message: 'Erreur lors de l\'inscription.' });
+//                 }
+//                 res.status(201).json({ message: 'Utilisateur inscrit avec succès.' });
+//             });
+//     });
+// });
+
+
+
+
+// // Route pour la connexion
+// app.post('/connexion', (req, res) => {
+//     const { email, mot_de_passe } = req.body;
+
+//     db.query('SELECT * FROM utilisateurs WHERE email = ?', [email], async (err, results) => {
+//         if (results.length === 0) {
+//             return res.status(400).json({ message: 'Utilisateur non trouvé.' });
+//         }
+
+//         const utilisateur = results[0];
+
+//         // Vérifier le mot de passe
+//         const mot_de_passe_correct = await bcrypt.compare(mot_de_passe, utilisateur.mot_de_passe);
+//         if (!mot_de_passe_correct) {
+//             return res.status(400).json({ message: 'Mot de passe incorrect.' });
+//         }
+
+//         // Générer un token JWT
+//         const token = jwt.sign({ id: utilisateur.id, email: utilisateur.email }, process.env.ACCESS_TOKEN_SECRET, {
+//             expiresIn: '1h'
+//         });
+
+//         res.json({ message: 'Connexion réussie', token });
+//     });
+// });
+
+
 app.post('/connexion', (req, res) => {
     const { email, mot_de_passe } = req.body;
 
@@ -88,8 +174,8 @@ app.post('/connexion', (req, res) => {
             return res.status(400).json({ message: 'Mot de passe incorrect.' });
         }
 
-        // Générer un token JWT
-        const token = jwt.sign({ id: utilisateur.id, email: utilisateur.email }, process.env.ACCESS_TOKEN_SECRET, {
+        // Générer un token JWT avec le rôle
+        const token = jwt.sign({ id: utilisateur.id, email: utilisateur.email, role: utilisateur.role }, process.env.ACCESS_TOKEN_SECRET, {
             expiresIn: '1h'
         });
 
