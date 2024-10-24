@@ -102,10 +102,12 @@ app.delete('/supprimer_utilisateur', verifierAdmin, (req, res) => {
 });
 
 
-app.post('/connexion', (req, res) => {
+app.post('/connexion', async (req, res) => {
     const { email, mot_de_passe } = req.body;
 
-    db.query('SELECT * FROM utilisateurs WHERE email = ?', [email], async (err, results) => {
+    try {
+        const [results] = await db.promise().query('SELECT * FROM utilisateurs WHERE email = ?', [email]);
+
         if (results.length === 0) {
             return res.status(400).json({ message: 'Utilisateur non trouvé.' });
         }
@@ -114,17 +116,23 @@ app.post('/connexion', (req, res) => {
 
         // Vérifier le mot de passe
         const mot_de_passe_correct = await bcrypt.compare(mot_de_passe, utilisateur.mot_de_passe);
+
         if (!mot_de_passe_correct) {
             return res.status(400).json({ message: 'Mot de passe incorrect.' });
         }
 
         // Générer un token JWT avec le rôle
-        const token = jwt.sign({ id: utilisateur.id, email: utilisateur.email, role: utilisateur.role }, process.env.ACCESS_TOKEN_SECRET, {
-            expiresIn: '1h'
-        });
+        const token = jwt.sign(
+            { id: utilisateur.id, email: utilisateur.email, role: utilisateur.role },
+            process.env.ACCESS_TOKEN_SECRET,
+            { expiresIn: '1h' }
+        );
 
         res.json({ message: 'Connexion réussie', token });
-    });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ message: 'Erreur de serveur.' });
+    }
 });
 
 
