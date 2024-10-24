@@ -8,7 +8,8 @@
 /* Fixe la barre de navigation et décale le contenu de la page */
 body {
     margin: 0;
-    padding-top: 60px; /* Espace pour la barre de navigation */
+    padding-top: 60px;
+    /* Espace pour la barre de navigation */
     background-color: #f0f0f0;
 }
 
@@ -53,7 +54,8 @@ button:hover {
 nav {
     background-color: #333;
     color: white;
-    position: fixed; /* Fixe la barre de navigation en haut de la page */
+    position: fixed;
+    /* Fixe la barre de navigation en haut de la page */
     width: 100%;
     top: 0;
     left: 0;
@@ -94,7 +96,8 @@ table {
     text-align: left;
 }
 
-th, td {
+th,
+td {
     padding: 12px 15px;
     border-bottom: 1px solid #ddd;
 }
@@ -112,17 +115,20 @@ tr:hover {
 
 td {
     word-wrap: break-word;
-    max-width: 300px;  /* Ajuster cette valeur selon tes besoins */
+    max-width: 300px;
+    /* Ajuster cette valeur selon tes besoins */
 }
 
 
 /* Loader pour indiquer que les données se chargent */
 #loader {
-    display: none;  /* Masqué par défaut */
+    display: none;
+    /* Masqué par défaut */
     text-align: center;
     margin-top: 20px;
 }
 
 #loader.active {
-    display: block;  /* Affiché quand la classe "active" est ajoutée */
+    display: block;
+    /* Affiché quand la classe "active" est ajoutée */
 }

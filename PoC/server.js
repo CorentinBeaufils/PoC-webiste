@@ -24,7 +24,7 @@ const db = mysql.createConnection({
     user: 'root',
     password: '123456789',  // Remplace par le mot de passe MySQL
     database: 'PoC',
-    connectTimeout : 20000
+    connectTimeout: 20000
 });
 
 
@@ -47,11 +47,11 @@ app.listen(PORT, () => {
 
 const verifierAdmin = (req, res, next) => {
     const token = req.headers['authorization'];
-    
+
     if (!token) {
         return res.status(403).json({ message: 'Token non fourni' });
     }
-  
+
     try {
         const decoded = jwt.verify(token.split(' ')[1], process.env.ACCESS_TOKEN_SECRET);
         if (decoded.role !== 'admin') {
@@ -102,62 +102,6 @@ app.delete('/supprimer_utilisateur', verifierAdmin, (req, res) => {
 });
 
 
-// // Route pour l'inscription
-// app.post('/inscription', async (req, res) => {
-//     const { nom, email, mot_de_passe } = req.body;
-
-//     // Vérifier si l'utilisateur existe déjà
-//     db.query('SELECT * FROM utilisateurs WHERE email = ?', [email], async (err, results) => {
-//         if (results.length > 0) {
-//             return res.status(400).json({ message: 'Cet utilisateur existe déjà.' });
-//         }
-//         console.log('test')
-//         // Hacher le mot de passe
-//         const mot_de_passe_hache = await bcrypt.hash(mot_de_passe, 10);
-
-//         // Insérer l'utilisateur dans la base de données
-//         db.query('INSERT INTO utilisateurs (nom, email, mot_de_passe) VALUES (?, ?, ?)',
-//             [nom, email, mot_de_passe_hache],
-//             (err, result) => {
-//                 if (err) {
-//                     console.error(err);
-//                     return res.status(500).json({ message: 'Erreur lors de l\'inscription.' });
-//                 }
-//                 res.status(201).json({ message: 'Utilisateur inscrit avec succès.' });
-//             });
-//     });
-// });
-
-
-
-
-// // Route pour la connexion
-// app.post('/connexion', (req, res) => {
-//     const { email, mot_de_passe } = req.body;
-
-//     db.query('SELECT * FROM utilisateurs WHERE email = ?', [email], async (err, results) => {
-//         if (results.length === 0) {
-//             return res.status(400).json({ message: 'Utilisateur non trouvé.' });
-//         }
-
-//         const utilisateur = results[0];
-
-//         // Vérifier le mot de passe
-//         const mot_de_passe_correct = await bcrypt.compare(mot_de_passe, utilisateur.mot_de_passe);
-//         if (!mot_de_passe_correct) {
-//             return res.status(400).json({ message: 'Mot de passe incorrect.' });
-//         }
-
-//         // Générer un token JWT
-//         const token = jwt.sign({ id: utilisateur.id, email: utilisateur.email }, process.env.ACCESS_TOKEN_SECRET, {
-//             expiresIn: '1h'
-//         });
-
-//         res.json({ message: 'Connexion réussie', token });
-//     });
-// });
-
-
 app.post('/connexion', (req, res) => {
     const { email, mot_de_passe } = req.body;
 
@@ -186,23 +130,23 @@ app.post('/connexion', (req, res) => {
 
 const verifierToken = (req, res, next) => {
     const token = req.headers['authorization'];
-    
+
     if (!token) {
-      return res.status(403).json({ message: 'Token non fourni' });
+        return res.status(403).json({ message: 'Token non fourni' });
     }
-  
+
     try {
-      // On retire "Bearer " de l'auth header pour ne garder que le token
-      const decoded = jwt.verify(token.split(' ')[1], process.env.ACCESS_TOKEN_SECRET);
-      req.utilisateur = decoded;  // On stocke l'utilisateur décodé dans la requête
-      next();
+        // On retire "Bearer " de l'auth header pour ne garder que le token
+        const decoded = jwt.verify(token.split(' ')[1], process.env.ACCESS_TOKEN_SECRET);
+        req.utilisateur = decoded;  // On stocke l'utilisateur décodé dans la requête
+        next();
     } catch (err) {
-      return res.status(401).json({ message: 'Token invalide' });
+        return res.status(401).json({ message: 'Token invalide' });
     }
-  };
+};
 
 
-  // Route protégée pour accéder à user.html
+// Route protégée pour accéder à user.html
 app.get('/user.html', verifierToken, (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'user.html'));
 });
@@ -213,8 +157,8 @@ app.post('/dossiers', verifierToken, (req, res) => {
     const { nom, description } = req.body;
     const utilisateur_id = req.utilisateur.id; // L'utilisateur connecté
 
-     // Log pour vérifier les valeurs passées
-     console.log('Création du dossier avec les valeurs :', { nom, description, utilisateur_id });
+    // Log pour vérifier les valeurs passées
+    console.log('Création du dossier avec les valeurs :', { nom, description, utilisateur_id });
     // Insérer un nouveau dossier dans la base de données
     db.query(
         'INSERT INTO dossiers (nom, description, utilisateur_id) VALUES (?, ?, ?)',

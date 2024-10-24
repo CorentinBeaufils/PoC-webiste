@@ -38,7 +38,7 @@ chargerDossiers();
 const afficherDossiers = (dossiers) => {
     dossiers.forEach(dossier => {
         const row = document.createElement('tr');
-        
+
         const nomCell = document.createElement('td');
         nomCell.textContent = dossier.nom;
 
