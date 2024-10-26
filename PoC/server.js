@@ -195,16 +195,27 @@ app.post('/dossiers', verifierToken, (req, res) => {
 });
 
 
-app.get('/dossiers', verifierToken, (req, res) => {
-    const limit = parseInt(req.query.limit) || 10;  // Nombre de dossiers à renvoyer (par défaut 10)
-    const offset = parseInt(req.query.offset) || 0;  // Décalage (offset) pour la pagination
+app.get('/dossiers', verifierToken, async (req, res) => {
+    console.log(`[${new Date().toISOString()}] Requête reçue pour /dossiers par l'utilisateur ID : ${req.utilisateur.id}`);
 
-    const query = 'SELECT * FROM dossiers LIMIT ? OFFSET ?';
-    db.query(query, [limit, offset], (err, results) => {
-        if (err) {
-            console.error('Erreur lors de la récupération des dossiers:', err);
-            return res.status(500).json({ message: 'Erreur lors de la récupération des dossiers.' });
-        }
+    const limit = parseInt(req.query.limit) || 10;  // Nombre de dossiers à renvoyer
+    const offset = parseInt(req.query.offset) || 0;  // Décalage (offset) pour la pagination
+    console.log(`[${new Date().toISOString()}] Paramètres de requête: limit = ${limit}, offset = ${offset}`);
+
+    try {
+        // Log de début de requête
+        console.log(`[${new Date().toISOString()}] Tentative de récupération des dossiers depuis la base de données`);
+        
+        // Exécution de la requête avec log de démarrage et fin
+        const [results] = await db.query('SELECT * FROM dossiers LIMIT ? OFFSET ?', [limit, offset]);
+        
+        console.log(`[${new Date().toISOString()}] Requête /dossiers réussie. Nombre de dossiers récupérés: ${results.length}`);
+        
         res.json(results);
-    });
+    } catch (err) {
+        console.error(`[${new Date().toISOString()}] Erreur dans la requête /dossiers:`, err);
+        res.status(500).json({ message: 'Erreur lors de la récupération des dossiers.' });
+    } finally {
+        console.log(`[${new Date().toISOString()}] Fin de traitement pour la requête /dossiers`);
+    }
 });
