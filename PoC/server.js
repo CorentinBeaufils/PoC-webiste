@@ -19,14 +19,27 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 
 // Connexion à la base de données MySQL
-const db = mysql.createConnection({
+const db = mysql.createPool({
     host: '127.0.0.1',
     user: 'root',
     password: '123456789',  // Remplace par le mot de passe MySQL
     database: 'PoC',
+    waitForConnections: true,
+    connectionLimit: 20,
+    queueLimit: 0,
     connectTimeout: 20000
 });
 
+
+// Fonction keep-alive pour éviter la déconnexion
+setInterval(async () => {
+    try {
+        await db.query('SELECT 1'); // Envoi une requête légère
+        console.log('Keep-alive: La connexion MySQL est active.');
+    } catch (err) {
+        console.error('Erreur de keep-alive:', err);
+    }
+}, 1000 * 60 * 5); // Envoie une requête toutes les 5 minutes
 
 db.connect((err) => {
     if (err) {
@@ -106,7 +119,7 @@ app.post('/connexion', async (req, res) => {
     const { email, mot_de_passe } = req.body;
 
     try {
-        const [results] = await db.promise().query('SELECT * FROM utilisateurs WHERE email = ?', [email]);
+        const [results] = await db.query('SELECT * FROM utilisateurs WHERE email = ?', [email]);
 
         if (results.length === 0) {
             return res.status(400).json({ message: 'Utilisateur non trouvé.' });
