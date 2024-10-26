@@ -16,20 +16,25 @@ const chargerDossiers = async () => {
         const response = await fetch(`http://72.255.240.81:5001/dossiers?limit=${limit}&offset=${offset}`, {
             method: 'GET',
             headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
+                'Authorization': `Bearer ${token}`
             }
         });
-
+    
+        console.log('Réponse:', response); // Vérifie le statut et les en-têtes de la réponse
+    
+        if (!response.ok) {
+            throw new Error(`Erreur ${response.status}: ${response.statusText}`);
+        }
+    
         const dossiers = await response.json();
         afficherDossiers(dossiers);
-
-        // Mettre à jour l'offset pour éviter de recharger les mêmes dossiers
         offset += limit;
     } catch (error) {
         console.error('Erreur lors de la récupération des dossiers:', error);
     } finally {
         isLoading = false;
     }
+    
 };
 
 // Charger les premiers dossiers au démarrage
