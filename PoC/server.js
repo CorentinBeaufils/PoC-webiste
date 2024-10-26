@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 import express from 'express';
-import mysql from 'mysql2';
+import mysql from 'mysql2/promise';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import path from 'path';
@@ -41,13 +41,13 @@ setInterval(async () => {
     }
 }, 1000 * 60 * 5); // Envoie une requête toutes les 5 minutes
 
-db.connect((err) => {
-    if (err) {
-        console.error('Erreur de connexion à MySQL:', err);
-        return;
-    }
-    console.log('Connecté à la base de données MySQL');
-});
+// db.connect((err) => {
+//     if (err) {
+//         console.error('Erreur de connexion à MySQL:', err);
+//         return;
+//     }
+//     console.log('Connecté à la base de données MySQL');
+// });
 
 // Démarrer le serveur
 const PORT = process.env.PORT || 3100;
