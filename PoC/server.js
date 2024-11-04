@@ -4,6 +4,7 @@ import mysql from 'mysql2/promise';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import path from 'path';
+import session from 'express-session';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 
@@ -15,7 +16,16 @@ app.use(express.json());
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-app.use(express.static(path.join(__dirname, 'public')));
+
+// Middleware pour analyser les données du formulaire
+app.use(express.urlencoded({ extended: true }));
+// Configurer le moteur de vue EJS et le répertoire des vues
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'src/views'));
+
+// Servir les fichiers statiques (CSS, JS) depuis le dossier public
+app.use(express.static(path.join(__dirname, 'src/public')));
+
 
 
 // Connexion à la base de données MySQL
@@ -41,14 +51,6 @@ setInterval(async () => {
     }
 }, 1000 * 60 * 5); // Envoie une requête toutes les 5 minutes
 
-// db.connect((err) => {
-//     if (err) {
-//         console.error('Erreur de connexion à MySQL:', err);
-//         return;
-//     }
-//     console.log('Connecté à la base de données MySQL');
-// });
-
 // Démarrer le serveur
 const PORT = process.env.PORT || 3100;
 app.listen(PORT, () => {
@@ -56,147 +58,170 @@ app.listen(PORT, () => {
 });
 
 
+app.use(session({
+    secret: process.env.ACCESS_TOKEN_SECRET, // Remplacez par une clé secrète
+    resave: false,
+    saveUninitialized: false,
+    cookie: { secure: false } // Mettez `true` si vous utilisez HTTPS en production
+}));
 
 
 const verifierAdmin = (req, res, next) => {
-    const token = req.headers['authorization'];
-
-    if (!token) {
-        return res.status(403).json({ message: 'Token non fourni' });
-    }
-
-    try {
-        const decoded = jwt.verify(token.split(' ')[1], process.env.ACCESS_TOKEN_SECRET);
-        if (decoded.role !== 'admin') {
-            return res.status(403).json({ message: 'Accès réservé aux administrateurs' });
-        }
-        req.utilisateur = decoded;
+    // Vérifier si l'utilisateur est authentifié et a le rôle d'administrateur
+    if (req.session.user && req.session.user.role === 'admin') {
+        console.log('admin action with mail: ',req.session.user.email)
         next();
-    } catch (err) {
-        return res.status(401).json({ message: 'Token invalide' });
+    } else {
+        console.log('admin request with email',req.session.user.email);
+        res.status(403).json({ message: 'Accès refusé : réservée aux administrateurs.' });
     }
 };
 
-// Route pour créer un utilisateur (protégée)
-app.post('/inscription', verifierAdmin, async (req, res) => {
-    const { nom, email, mot_de_passe } = req.body;
 
-    const mot_de_passe_hache = await bcrypt.hash(mot_de_passe, 10);
+const verifierSession = (req, res, next) => {
+    if (req.session.user) {
+        next();
+    } else {
+        res.redirect('/login'); // Redirige vers la page de connexion si la session n'existe pas
+    }
+};
 
-    db.query('INSERT INTO utilisateurs (nom, email, mot_de_passe) VALUES (?, ?, ?)',
-        [nom, email, mot_de_passe_hache],
-        (err, result) => {
-            if (err) {
-                console.error(err);
-                return res.status(500).json({ message: 'Erreur lors de la création de l\'utilisateur.' });
-            }
-            res.status(201).json({ message: 'Utilisateur créé avec succès.' });
-        }
-    );
-});
-
-
-
-// Route pour supprimer un utilisateur
-app.delete('/supprimer_utilisateur', verifierAdmin, (req, res) => {
-    const { email } = req.body;
-
-    db.query('DELETE FROM utilisateurs WHERE email = ?', [email], (err, result) => {
+app.post('/logout', (req, res) => {
+    req.session.destroy((err) => {
         if (err) {
-            return res.status(500).json({ message: 'Erreur lors de la suppression de l\'utilisateur.' });
+            return res.status(500).json({ message: "Erreur lors de la déconnexion" });
         }
-
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ message: 'Utilisateur non trouvé.' });
-        }
-
-        res.status(200).json({ message: 'Utilisateur supprimé avec succès.' });
+        res.redirect('/login');
     });
 });
 
 
+
+app.get('/login', (req, res) => {
+    res.render('login');
+});
+
+app.get('/user', verifierSession, (req, res) => {
+    res.render('user', { user: req.session.user });
+});
+
+app.get('/dossier', verifierSession, (req, res) => {
+    res.render('dossier');
+});
+
+app.get('/dossier_list', verifierSession, (req, res) => {
+    res.render('dossier_list');
+});
+
+
+
+// Route pour créer un utilisateur (protégée par le rôle admin)
+app.post('/inscription', verifierAdmin, async (req, res) => {
+    const { nom, email, mot_de_passe, role } = req.body;
+
+    try {
+        const mot_de_passe_hache = await bcrypt.hash(mot_de_passe, 10);
+
+        // Insérer un nouvel utilisateur dans la base de données
+        const [result] = await db.query(
+            'INSERT INTO utilisateurs (nom, email, mot_de_passe, role) VALUES (?, ?, ?, ?)',
+            [nom, email, mot_de_passe_hache, role]
+        );
+
+        
+    } catch (err) {
+        console.error('Erreur lors de la création de l’utilisateur :', err);
+        res.status(500).json({ message: 'Erreur lors de la création de l\'utilisateur.' });
+    }
+});
+
+
+app.delete('/supprimer_utilisateur', verifierAdmin, async (req, res) => {
+    const email = req.query.email;
+    console.log("Email reçu pour suppression :", email);
+
+    if (!email) {
+        console.log('issue 1');
+        return res.status(400).json({ message: 'Email requis pour supprimer un utilisateur.' });
+    }
+
+    try {
+        const [result] = await db.query('DELETE FROM utilisateurs WHERE email = ?', [email]);
+
+        if (result.affectedRows === 0) {
+            console.log('issue 3');
+            return res.status(404).json({ message: 'Utilisateur non trouvé.' });
+        }
+
+        console.log('Utilisateur supprimé avec succès');
+        res.status(200).json({ message: 'Utilisateur supprimé avec succès.' });
+    } catch (err) {
+        console.log('issue 2', err);
+        return res.status(500).json({ message: 'Erreur lors de la suppression de l\'utilisateur.' });
+    }
+});
+
+
+
+
+
 app.post('/connexion', async (req, res) => {
     const { email, mot_de_passe } = req.body;
+    console.log(req.body);
 
     try {
         const [results] = await db.query('SELECT * FROM utilisateurs WHERE email = ?', [email]);
 
         if (results.length === 0) {
-            return res.status(400).json({ message: 'Utilisateur non trouvé.' });
+            console.log("Utilisateur non trouvé.");
+            return res.status(400).send('Utilisateur non trouvé.');
         }
 
         const utilisateur = results[0];
-
-        // Vérifier le mot de passe
         const mot_de_passe_correct = await bcrypt.compare(mot_de_passe, utilisateur.mot_de_passe);
 
         if (!mot_de_passe_correct) {
-            return res.status(400).json({ message: 'Mot de passe incorrect.' });
+            console.log("Mot de passe incorrect.");
+            return res.status(400).send('Mot de passe incorrect.');
         }
 
-        // Générer un token JWT avec le rôle
-        const token = jwt.sign(
-            { id: utilisateur.id, email: utilisateur.email, role: utilisateur.role },
-            process.env.ACCESS_TOKEN_SECRET,
-            { expiresIn: '1h' }
-        );
+        // Stocker les informations utilisateur dans la session
+        req.session.user = {
+            id: utilisateur.id,
+            email: utilisateur.email,
+            role: utilisateur.role
+        };
 
-        res.json({ message: 'Connexion réussie', token });
+        console.log("Connexion réussie, redirection vers /user");
+        res.redirect('/user');
     } catch (err) {
-        console.error(err);
-        return res.status(500).json({ message: 'Erreur de serveur.' });
+        console.error("Erreur de serveur :", err);
+        res.status(500).send('Erreur de serveur.');
     }
-});
-
-
-const verifierToken = (req, res, next) => {
-    const token = req.headers['authorization'];
-
-    if (!token) {
-        return res.status(403).json({ message: 'Token non fourni' });
-    }
-
-    try {
-        // On retire "Bearer " de l'auth header pour ne garder que le token
-        const decoded = jwt.verify(token.split(' ')[1], process.env.ACCESS_TOKEN_SECRET);
-        req.utilisateur = decoded;  // On stocke l'utilisateur décodé dans la requête
-        next();
-    } catch (err) {
-        return res.status(401).json({ message: 'Token invalide' });
-    }
-};
-
-
-// Route protégée pour accéder à user.html
-app.get('/user.html', verifierToken, (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'user.html'));
 });
 
 
 // Route pour ajouter un dossier (nécessite que l'utilisateur soit connecté)
-app.post('/dossiers', verifierToken, (req, res) => {
+app.post('/dossiers', verifierSession, async (req, res) => {
     const { nom, description } = req.body;
-    const utilisateur_id = req.utilisateur.id; // L'utilisateur connecté
+    const utilisateur_id = req.session.user.id; // L'utilisateur connecté
 
-    // Log pour vérifier les valeurs passées
-    console.log('Création du dossier avec les valeurs :', { nom, description, utilisateur_id });
-    // Insérer un nouveau dossier dans la base de données
-    db.query(
-        'INSERT INTO dossiers (nom, description, utilisateur_id) VALUES (?, ?, ?)',
-        [nom, description, utilisateur_id],
-        (err, result) => {
-            if (err) {
-                console.error(err);
-                return res.status(500).json({ message: 'Erreur lors de la création du dossier.' });
-            }
-            res.status(201).json({ message: 'Dossier créé avec succès.' });
-        }
-    );
+    try {
+        const [result] = await  db.query(
+            'INSERT INTO dossiers (nom, description, utilisateur_id) VALUES (?, ?, ?)',
+            [nom, description, utilisateur_id]);
+            console.log('creation du dossier avec les parametres (nom,description,utilisateur_id) : ',nom,description,utilisateur_id);
+            res.status(201).json({ message: 'dossier créé avec succès.' });
+    } catch (err) {
+        console.error('Erreur lors de la création du dossier :', err);
+        res.status(500).json({ message: 'Erreur lors de la création du dossier.' });
+    }
 });
 
 
-app.get('/dossiers', verifierToken, async (req, res) => {
-    console.log(`[${new Date().toISOString()}] Requête reçue pour /dossiers par l'utilisateur ID : ${req.utilisateur.id}`);
+// Route pour récupérer les dossiers (nécessite que l'utilisateur soit connecté)
+app.get('/dossiers', verifierSession, async (req, res) => {
+    console.log(`[${new Date().toISOString()}] Requête reçue pour /dossiers par l'utilisateur ID : ${req.session.user.id}`);
 
     const limit = parseInt(req.query.limit) || 10;  // Nombre de dossiers à renvoyer
     const offset = parseInt(req.query.offset) || 0;  // Décalage (offset) pour la pagination
@@ -219,3 +244,4 @@ app.get('/dossiers', verifierToken, async (req, res) => {
         console.log(`[${new Date().toISOString()}] Fin de traitement pour la requête /dossiers`);
     }
 });
+

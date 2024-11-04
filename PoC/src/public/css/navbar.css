@@ -1,0 +1,36 @@
+/* Style de la barre de navigation */
+.navbar-main {
+    background-color: #333;
+    color: white;
+    position: fixed;
+    /* Fixe la barre de navigation en haut de la page */
+    width: 100%;
+    top: 0;
+    left: 0;
+    padding: 10px;
+    z-index: 1000;
+}
+
+.navbar-main ul {
+    list-style: none;
+    display: flex;
+    justify-content: space-around;
+    margin: 0;
+    padding: 0;
+}
+
+.navbar-main ul li {
+    display: inline;
+}
+
+.navbar-main ul li a {
+    color: white;
+    text-decoration: none;
+    padding: 10px 20px;
+    display: inline-block;
+}
+
+.navbar-main ul li a:hover {
+    background-color: #575757;
+    border-radius: 5px;
+}

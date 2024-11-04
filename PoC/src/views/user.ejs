@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil Utilisateur</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/navbar.css"> <!-- Inclure les styles de la barre de navigation -->
+</head>
+<body>
+    <!-- Barre de navigation -->
+    <%- include('partials/navbar') %> <!-- Inclure la barre de navigation -->
+
+    <div class="container">
+        <h2>Bienvenue, <%= user.email %>!</h2>
+
+        <% if (user.role === 'admin') { %>
+            <!-- Actions administrateur, affichées uniquement pour les administrateurs -->
+            <div id="adminActions">
+                <h3>Actions Administrateur</h3>
+
+                <!-- Formulaire pour créer un utilisateur -->
+                <form id="createUserForm">
+                    <h4>Créer un utilisateur</h4>
+                    <input type="text" id="nom" placeholder="Nom" required>
+                    <input type="email" id="email" placeholder="Email" required>
+                    <input type="password" id="mot_de_passe" placeholder="Mot de passe" required>
+                    <select id="role">
+                        <option value="user">Utilisateur</option>
+                        <option value="admin">Administrateur</option>
+                    </select>
+                    <button type="submit">Créer un utilisateur</button>
+                    <p id="createMessage"></p>
+                </form>
+
+                <!-- Formulaire pour supprimer un utilisateur -->
+                <form id="deleteUserForm">
+                    <h4>Supprimer un utilisateur</h4>
+                    <input type="email" id="deleteEmail" placeholder="Email de l'utilisateur à supprimer" required>
+                    <button type="submit">Supprimer l'utilisateur</button>
+                    <p id="deleteMessage"></p>
+                </form>
+            </div>
+        <% } %>
+    </div>
+
+    <!-- Charger le fichier JavaScript séparé pour le profil utilisateur -->
+    <script src="/js/user.js"></script>
+</body>
+</html>
+
