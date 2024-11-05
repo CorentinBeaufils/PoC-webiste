@@ -1,7 +1,5 @@
-/* login.css */
-
 body {
-    background-color: #f0f4f8; /* Couleur de fond spécifique à la page de connexion */
+    background-color: #f0f4f8;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -9,14 +7,28 @@ body {
     font-family: Arial, sans-serif;
 }
 
-form {
-    background-color: #ffffff;
-    padding: 2em;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+.login-form {
     width: 100%;
     max-width: 400px;
+    margin: 0 auto;
     text-align: center;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.login-form .logo {
+    width: 80%;
+    /* Ajuste la largeur du logo */
+    max-width: 200px;
+    /* Taille maximale */
+    height: auto;
+    margin-bottom: 20px;
+}
+
+form {
+    width: 100%;
 }
 
 input[type="email"],
