@@ -1,0 +1,33 @@
+<div id="customerInfo" class="section-divider editable-section">
+                    <h3>Détails du Client</h3>
+                    <div id="detailsCustomerInfo"></div>
+
+                    <button class="editButton" data-section="customerInfo" onclick="enableEditing(this)">Edit</button>
+                    <button class="saveButton" data-section="customerInfo" onclick="saveCustomerDetails(this)"
+                        style="display: none;">Save</button>
+                </div>
+
+                <div id="addresses" class="section-divider editable-section">
+                    <h3>Adresses</h3>
+                    <div id="detailsAddressesContainer"></div>
+                    <button class="editButton" data-section="addresses" onclick="enableEditing(this)">Edit</button>
+                    <button class="saveButton" data-section="addresses" onclick="saveCustomerDetails(this)"
+                        style="display: none;">Save</button>
+                </div>
+
+                <div id="contacts" class="section-divider editable-section">
+                    <h3>Contacts</h3>
+                    <div id="detailsContactsContainer"></div>
+                    <button class="editButton" data-section="contacts" onclick="enableEditing(this)">Edit</button>
+                    <button class="saveButton" data-section="contacts" onclick="saveCustomerDetails(this)"
+                        style="display: none;">Save</button>
+                </div>
+
+                <div id="communicationMethods" class="section-divider editable-section">
+                    <h3>Moyens de Communication</h3>
+                    <div id="detailsCommunicationContainer"></div>
+                    <button class="editButton" data-section="communicationMethods"
+                        onclick="enableEditing(this)">Edit</button>
+                    <button class="saveButton" data-section="communicationMethods" onclick="saveCustomerDetails(this)"
+                        style="display: none;">Save</button>
+                </div>

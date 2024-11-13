@@ -25,7 +25,7 @@
         </div>
 
         <!-- Section pour créer un client -->
-        <section id="createCustomer" class="customer-section">
+        <section id="createCustomer" class="main-section customer-section">
             <h2>Informations du Client</h2>
             <form id="customerForm">
                 <!-- Informations de base du client -->
@@ -94,12 +94,15 @@
                 <div class="section-divider"></div>
                 <h3>Moyens de Communication Supplémentaires</h3>
                 <div id="communicationMethodForm">
-                    <label for="methodType">Type de Moyen :</label>
-                    <input type="text" id="methodType" name="method_type">
+                    <div class="communication-method-block">
+                        <label for="methodType">Type de Moyen :</label>
+                        <input type="text" id="methodType" name="method_type">
 
-                    <label for="methodDetails">Détails :</label>
-                    <input type="text" id="methodDetails" name="details">
+                        <label for="methodDetails">Détails :</label>
+                        <input type="text" id="methodDetails" name="details">
+                    </div>
                 </div>
+                <button type="button" onclick="addNewCommunicationMethodBlock()">Ajouter un Moyen de Communication</button>
 
                 <!-- Bouton pour enregistrer le client avec toutes les informations -->
                 <button type="submit">Enregistrer le Client avec les Informations Complètes</button>
@@ -107,52 +110,40 @@
         </section>
 
         <!-- Nouvelle section pour voir la liste des clients -->
-        <section id="viewCustomers" class="customer-section" style="display: none;">
+        <section id="viewCustomers" class="main-section customer-section" style="display: none;">
             <div id="customerList">
                 <h2>Liste des Clients</h2>
                 <div id="customerContainer"></div> <!-- Conteneur pour la liste des clients -->
             </div>
 
-            <div id="customerDetails" style="display: none;">
-                <div id="customerInfo" class="section-divider editable-section">
-                    <h3>Détails du Client</h3>
-                    <div id="detailsCustomerInfo"></div>
+            <!-- Section pour afficher les détails d'un client -->
+            <section id="customerDetails" class="sub-section" style="display: none;">
+                <h2>Détails du Client</h2>
+                <div id="detailsCustomerInfo" class="info-block"></div>
 
-                    <button class="editButton" data-section="customerInfo" onclick="enableEditing(this)">Edit</button>
-                    <button class="saveButton" data-section="customerInfo" onclick="saveCustomerDetails(this)"
-                        style="display: none;">Save</button>
+                <h3>Adresses</h3>
+                <div id="detailsAddressesContainer" class="address-block">
+                    <button onclick="addNewAddressBlock()">Ajouter une adresse</button>
                 </div>
 
-                <div id="addresses" class="section-divider editable-section">
-                    <h3>Adresses</h3>
-                    <div id="detailsAddressesContainer"></div>
-                    <button class="editButton" data-section="addresses" onclick="enableEditing(this)">Edit</button>
-                    <button class="saveButton" data-section="addresses" onclick="saveCustomerDetails(this)"
-                        style="display: none;">Save</button>
+                <h3>Contacts</h3>
+                <div id="detailsContactsContainer" class="contact-block">
+                    <button onclick="addNewContactBlock()">Ajouter un contact</button>
                 </div>
 
-                <div id="contacts" class="section-divider editable-section">
-                    <h3>Contacts</h3>
-                    <div id="detailsContactsContainer"></div>
-                    <button class="editButton" data-section="contacts" onclick="enableEditing(this)">Edit</button>
-                    <button class="saveButton" data-section="contacts" onclick="saveCustomerDetails(this)"
-                        style="display: none;">Save</button>
+
+                <h3>Méthodes de Communication</h3>
+                <div id="detailsCommunicationMethodsContainer" class="communication-method-block">
+                    <button onclick="addNewCommunicationMethodBlock()">Ajouter une méthode de communication</button>
                 </div>
 
-                <div id="communicationMethods" class="section-divider editable-section">
-                    <h3>Moyens de Communication</h3>
-                    <div id="detailsCommunicationContainer"></div>
-                    <button class="editButton" data-section="communicationMethods"
-                        onclick="enableEditing(this)">Edit</button>
-                    <button class="saveButton" data-section="communicationMethods" onclick="saveCustomerDetails(this)"
-                        style="display: none;">Save</button>
-                </div>
+                <button onclick="showSection('viewCustomers')">Retour à la liste des clients</button>
+            </section>
             </div>
         </section>
 
-
         <!-- Section pour les communications -->
-        <section id="communications" class="customer-section" style="display: none;">
+        <section id="communications" class="main-section customer-section" style="display: none;">
             <h2>Communications / Notes</h2>
             <form id="communicationForm">
                 <label for="communicationContent">Contenu de la Communication :</label>
@@ -163,7 +154,7 @@
         </section>
 
         <!-- Section pour les commandes -->
-        <section id="orders" class="customer-section" style="display: none;">
+        <section id="orders" class="main-section customer-section" style="display: none;">
             <h2>Commandes</h2>
             <p>Section réservée pour les commandes (non encore implémentée).</p>
         </section>

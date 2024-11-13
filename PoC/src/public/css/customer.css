@@ -1,34 +1,23 @@
 /* Style général de la page */
 body {
     font-family: Arial, sans-serif;
-    background-color: #f4f6f8;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 60px;
-    padding: 20px;
-    color: #333;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
 }
 
-h1 {
-    font-size: 2em;
-    color: #0056b3;
-    margin-bottom: 20px;
-}
-
-/* Style des sections principales */
-section {
+/* Style des sections */
+.main-section {
     width: 100%;
     max-width: 800px;
     background-color: #ffffff;
     padding: 20px;
-    margin-bottom: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin: 20px auto;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-section h2 {
-    color: #007bff;
+h2, h3 {
     font-size: 1.5em;
     margin-bottom: 15px;
     border-bottom: 2px solid #007bff;
@@ -42,43 +31,47 @@ form {
 }
 
 label {
-    margin-top: 10px;
+    display: block;
     font-weight: bold;
+    margin-bottom: 5px;
 }
 
-input[type="text"],
-input[type="email"],
-input[type="tel"],
-select,
-textarea {
+input, select, textarea {
     width: 100%;
-    padding: 10px;
-    margin-top: 5px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 1em;
-    box-sizing: border-box;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box; /* Assurez-vous que la largeur inclut le padding et la bordure */
 }
 
 textarea {
-    resize: vertical;
-    min-height: 80px;
+    resize: vertical; /* Permettre uniquement le redimensionnement vertical */
+    min-height: 100px; /* Hauteur minimale pour les textarea */
 }
 
 button {
-    margin-top: 15px;
-    padding: 10px;
-    background-color: #007bff;
-    color: #ffffff;
+    padding: 10px 15px;
     border: none;
-    border-radius: 4px;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: #fff;
     cursor: pointer;
-    font-size: 1em;
     transition: background-color 0.3s;
 }
 
 button:hover {
     background-color: #0056b3;
+}
+
+/* Style spécifique pour le bouton de soumission */
+button[type="submit"] {
+    background-color: #28a745;
+    margin-top: 20px;
+}
+
+button[type="submit"]:hover {
+    background-color: #218838;
 }
 
 /* Style des messages de succès/erreur */
@@ -141,34 +134,15 @@ button:hover {
     background-color: #0056b3;
 }
 
-/* Style général de la page */
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f6f8;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 60px;
-    padding: 20px;
-    color: #333;
-}
-
 /* Autres styles existants de customer.css */
 
-.section-divider {
-    margin-top: 20px;
-    border-top: 2px solid #007bff;
-    padding-top: 20px;
-}
-
-.info-block .address-block, .contact-block {
-    margin-bottom: 15px;
-    padding: 15px;
-    background-color: #f9f9f9;
-    border: 1px solid #ddd;
+.info-block, .address-block, .contact-block, .communication-method-block {
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
     border-radius: 5px;
+    background-color: #f9f9f9;
 }
-
 
 /* Styles pour les détails des clients */
 .customer-section {
@@ -191,7 +165,96 @@ body {
 }
 
 .section-divider {
-    margin-top: 20px;
-    border-top: 2px solid #007bff;
+    margin: 20px 0;
+    border-bottom: 2px solid #007bff;
     padding-top: 20px;
+}
+
+/* Style pour la liste des clients */
+.customer-item {
+    padding: 10px;
+    margin: 5px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.customer-item:hover {
+    background-color: #e0e0e0;
+}
+
+/* Style des diviseurs de section */
+.section-divider {
+    margin: 20px 0;
+    border-bottom: 2px solid #007bff;
+}
+
+/* Style pour les détails du client */
+.sub-section {
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #fff;
+    margin-top: 20px;
+    overflow: hidden; /* Empêche le débordement */
+}
+
+.sub-section h2 {
+    margin-top: 0;
+}
+
+.sub-section h3 {
+    margin-top: 20px;
+}
+
+.sub-section div {
+    margin-bottom: 10px;
+}
+
+.sub-section label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.sub-section input,
+.sub-section select {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.sub-section button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.sub-section button:hover {
+    background-color: #0056b3;
+}
+
+/* Style pour la section viewCustomers */
+#viewCustomers {
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Espace entre les éléments */
+}
+
+#customerList {
+    flex: 1;
+    overflow-y: auto; /* Permet le défilement vertical si nécessaire */
+}
+
+#customerDetails {
+    flex: 2;
+    overflow-y: auto; /* Permet le défilement vertical si nécessaire */
 }
