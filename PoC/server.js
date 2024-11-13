@@ -1,12 +1,13 @@
 import dotenv from 'dotenv';
 import express from 'express';
-import mysql from 'mysql2/promise';
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
 import path from 'path';
 import session from 'express-session';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import { verifierSession, verifierAdmin } from './src/middleware/authMiddleware.js';
+import customerRoutes from './src/routes/customerRoutes.js'; // Chemin des routes clients
+import db from './src/db.js'; // Assurez-vous du chemin correct
 
 dotenv.config();
 
@@ -26,19 +27,8 @@ app.set('views', path.join(__dirname, 'src/views'));
 // Servir les fichiers statiques (CSS, JS) depuis le dossier public
 app.use(express.static(path.join(__dirname, 'src/public')));
 
-
-
-// Connexion à la base de données MySQL
-const db = mysql.createPool({
-    host: '127.0.0.1',
-    user: 'root',
-    password: '123456789',  // Remplace par le mot de passe MySQL
-    database: 'PoC',
-    waitForConnections: true,
-    connectionLimit: 20,
-    queueLimit: 0,
-    connectTimeout: 20000
-});
+// Utilisez les routes pour les clients
+app.use(customerRoutes);
 
 
 // Fonction keep-alive pour éviter la déconnexion
@@ -66,26 +56,6 @@ app.use(session({
 }));
 
 
-const verifierAdmin = (req, res, next) => {
-    // Vérifier si l'utilisateur est authentifié et a le rôle d'administrateur
-    if (req.session.user && req.session.user.role === 'admin') {
-        console.log('admin action with mail: ',req.session.user.email)
-        next();
-    } else {
-        console.log('admin request with email',req.session.user.email);
-        res.status(403).json({ message: 'Accès refusé : réservée aux administrateurs.' });
-    }
-};
-
-
-const verifierSession = (req, res, next) => {
-    if (req.session.user) {
-        next();
-    } else {
-        res.redirect('/login'); // Redirige vers la page de connexion si la session n'existe pas
-    }
-};
-
 app.post('/logout', (req, res) => {
     req.session.destroy((err) => {
         if (err) {
@@ -111,6 +81,10 @@ app.get('/dossier', verifierSession, (req, res) => {
 
 app.get('/dossier_list', verifierSession, (req, res) => {
     res.render('dossier_list');
+});
+
+app.get('/customer',verifierSession, (req,res) => {
+    res.render('customer');
 });
 
 
@@ -244,4 +218,3 @@ app.get('/dossiers', verifierSession, async (req, res) => {
         console.log(`[${new Date().toISOString()}] Fin de traitement pour la requête /dossiers`);
     }
 });
-

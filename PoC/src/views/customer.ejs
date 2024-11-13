@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Clients</title>
+    <link rel="stylesheet" href="/css/customer.css">
+    <link rel="stylesheet" href="/css/navbar.css">
+    <script src="/js/customer.js" defer></script>
+</head>
+
+<body>
+    <!-- Inclure la barre de navigation -->
+    <%- include('partials/navbar') %>
+
+        <h1>Gestion des Clients</h1>
+
+        <!-- Menu de navigation pour basculer entre les sections -->
+        <div class="customer-nav">
+            <button onclick="showSection('createCustomer')">Créer un Client</button>
+            <button onclick="showSection('viewCustomers')">Voir les Clients</button>
+            <button onclick="showSection('communications')">Communications / Notes</button>
+            <button onclick="showSection('orders')">Commandes</button>
+        </div>
+
+        <!-- Section pour créer un client -->
+        <section id="createCustomer" class="customer-section">
+            <h2>Informations du Client</h2>
+            <form id="customerForm">
+                <!-- Informations de base du client -->
+                <div id="infosCustommers">
+                    <div class="info-block">
+                        <label for="customerName">Nom du Client :</label>
+                        <input type="text" id="customerName" name="name" required>
+
+                        <label for="customerNotes">Notes :</label>
+                        <textarea id="customerNotes" name="notes"></textarea>
+                    </div>
+                </div>
+
+                <!-- Section pour les adresses -->
+                <div class="section-divider"></div>
+                <h3>Adresses</h3>
+                <div id="addressesContainer">
+                    <div class="address-block">
+                        <label for="addressType">Type d'Adresse :</label>
+                        <select id="addressType" name="type" disabled>
+                            <option value="main" selected>Principale</option>
+                        </select>
+
+                        <label for="addressLine1">Adresse Ligne 1 :</label>
+                        <input type="text" id="addressLine1" name="address_line1" required>
+
+                        <label for="addressLine2">Adresse Ligne 2 :</label>
+                        <input type="text" id="addressLine2" name="address_line2">
+
+                        <label for="city">Ville :</label>
+                        <input type="text" id="city" name="city">
+
+                        <label for="state">État :</label>
+                        <input type="text" id="state" name="state">
+
+                        <label for="zipCode">Code Postal :</label>
+                        <input type="text" id="zipCode" name="zip_code">
+
+                        <label for="country">Pays :</label>
+                        <input type="text" id="country" name="country">
+                    </div>
+                </div>
+                <button type="button" onclick="addNewAddressBlock()">Ajouter une Adresse Annexe</button>
+
+                <!-- Section pour les contacts -->
+                <div class="section-divider"></div>
+                <h3>Contacts</h3>
+                <div id="contactsContainer">
+                    <div class="contact-block">
+                        <label for="contactName">Nom du Contact :</label>
+                        <input type="text" id="contactName" name="name" required>
+
+                        <label for="contactPhone">Numéro de Téléphone :</label>
+                        <input type="tel" id="contactPhone" name="phone_number">
+
+                        <label for="contactEmail">Email :</label>
+                        <input type="email" id="contactEmail" name="email">
+
+                        <label for="contactDirectPhone">Téléphone Direct :</label>
+                        <input type="tel" id="contactDirectPhone" name="direct_phone">
+                    </div>
+                </div>
+                <button type="button" onclick="addNewContactBlock()">Ajouter un Nouveau Contact</button>
+
+                <!-- Section pour les moyens de communication -->
+                <div class="section-divider"></div>
+                <h3>Moyens de Communication Supplémentaires</h3>
+                <div id="communicationMethodForm">
+                    <label for="methodType">Type de Moyen :</label>
+                    <input type="text" id="methodType" name="method_type">
+
+                    <label for="methodDetails">Détails :</label>
+                    <input type="text" id="methodDetails" name="details">
+                </div>
+
+                <!-- Bouton pour enregistrer le client avec toutes les informations -->
+                <button type="submit">Enregistrer le Client avec les Informations Complètes</button>
+            </form>
+        </section>
+
+        <!-- Nouvelle section pour voir la liste des clients -->
+        <section id="viewCustomers" class="customer-section" style="display: none;">
+            <div id="customerList">
+                <h2>Liste des Clients</h2>
+                <div id="customerContainer"></div> <!-- Conteneur pour la liste des clients -->
+            </div>
+
+            <div id="customerDetails" style="display: none;">
+                <div id="customerInfo" class="section-divider editable-section">
+                    <h3>Détails du Client</h3>
+                    <div id="detailsCustomerInfo"></div>
+
+                    <button class="editButton" data-section="customerInfo" onclick="enableEditing(this)">Edit</button>
+                    <button class="saveButton" data-section="customerInfo" onclick="saveCustomerDetails(this)"
+                        style="display: none;">Save</button>
+                </div>
+
+                <div id="addresses" class="section-divider editable-section">
+                    <h3>Adresses</h3>
+                    <div id="detailsAddressesContainer"></div>
+                    <button class="editButton" data-section="addresses" onclick="enableEditing(this)">Edit</button>
+                    <button class="saveButton" data-section="addresses" onclick="saveCustomerDetails(this)"
+                        style="display: none;">Save</button>
+                </div>
+
+                <div id="contacts" class="section-divider editable-section">
+                    <h3>Contacts</h3>
+                    <div id="detailsContactsContainer"></div>
+                    <button class="editButton" data-section="contacts" onclick="enableEditing(this)">Edit</button>
+                    <button class="saveButton" data-section="contacts" onclick="saveCustomerDetails(this)"
+                        style="display: none;">Save</button>
+                </div>
+
+                <div id="communicationMethods" class="section-divider editable-section">
+                    <h3>Moyens de Communication</h3>
+                    <div id="detailsCommunicationContainer"></div>
+                    <button class="editButton" data-section="communicationMethods"
+                        onclick="enableEditing(this)">Edit</button>
+                    <button class="saveButton" data-section="communicationMethods" onclick="saveCustomerDetails(this)"
+                        style="display: none;">Save</button>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- Section pour les communications -->
+        <section id="communications" class="customer-section" style="display: none;">
+            <h2>Communications / Notes</h2>
+            <form id="communicationForm">
+                <label for="communicationContent">Contenu de la Communication :</label>
+                <textarea id="communicationContent" name="content" required></textarea>
+                <button type="submit">Enregistrer la Communication</button>
+            </form>
+            <div id="communicationList"></div>
+        </section>
+
+        <!-- Section pour les commandes -->
+        <section id="orders" class="customer-section" style="display: none;">
+            <h2>Commandes</h2>
+            <p>Section réservée pour les commandes (non encore implémentée).</p>
+        </section>
+
+        <!-- Message d'erreur ou de succès -->
+        <p id="message"></p>
+</body>
+
+</html>
