@@ -119,27 +119,22 @@
             <!-- Section pour afficher les détails d'un client -->
             <section id="customerDetails" class="sub-section" style="display: none;">
                 <h2>Détails du Client</h2>
-                <div id="detailsCustomerInfo" class="info-block"></div>
+                <div id="detailsCustomerInfo" class = "info-block"></div>
 
                 <h3>Adresses</h3>
-                <div id="detailsAddressesContainer" class="address-block">
-                    <button onclick="addNewAddressBlock()">Ajouter une adresse</button>
-                </div>
+                <div id="detailsAddressesContainer" ></div>
+                <button onclick="addNewAddressBlock()">Ajouter une adresse</button>
 
                 <h3>Contacts</h3>
-                <div id="detailsContactsContainer" class="contact-block">
-                    <button onclick="addNewContactBlock()">Ajouter un contact</button>
-                </div>
-
+                <div id="detailsContactsContainer"></div>
+                <button onclick="addNewContactBlock()">Ajouter un contact</button>
 
                 <h3>Méthodes de Communication</h3>
-                <div id="detailsCommunicationMethodsContainer" class="communication-method-block">
-                    <button onclick="addNewCommunicationMethodBlock()">Ajouter une méthode de communication</button>
-                </div>
+                <div id="detailsCommunicationMethodsContainer" ></div>
+                <button onclick="addCommunicationMethodBlock()">Ajouter une méthode de communication</button>
 
                 <button onclick="showSection('viewCustomers')">Retour à la liste des clients</button>
             </section>
-            </div>
         </section>
 
         <!-- Section pour les communications -->

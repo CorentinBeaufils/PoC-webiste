@@ -154,5 +154,328 @@ router.get('/api/customers/:id', async (req, res) => {
 });
 
 
-export default router;
+// Route pour mettre à jour les informations d'un client
+router.put('/api/customers/:id', async (req, res) => {
+    const customerId = req.params.id;
+    const updatedData = req.body;
 
+    console.log(`Requête de mise à jour reçue pour le client ID: ${customerId}`);
+    console.log('Données mises à jour:', updatedData);
+
+    const { name, notes } = updatedData;
+
+    try {
+        const connection = await db.getConnection();
+
+        const [result] = await connection.query(
+            'UPDATE customers SET name = ?, notes = ? WHERE id = ?',
+            [name, notes, customerId]
+        );
+
+        connection.release();
+
+        if (result.affectedRows === 0) {
+            console.log(`Client ID: ${customerId} non trouvé.`);
+            return res.status(404).send({ message: 'Client non trouvé' });
+        }
+
+        console.log(`Client ID: ${customerId} mis à jour avec succès.`);
+        res.send({ message: 'Client mis à jour avec succès' });
+    } catch (error) {
+        console.error('Erreur lors de la mise à jour des informations du client:', error);
+        res.status(500).send({ message: 'Erreur lors de la mise à jour des informations du client' });
+    }
+});
+
+// Route pour mettre à jour une adresse d'un client
+router.put('/api/customers/:customerId/addresses/:addressId', async (req, res) => {
+    const customerId = req.params.customerId;
+    const addressId = req.params.addressId;
+    const updatedAddress = req.body;
+
+    console.log(`Requête de mise à jour reçue pour l'adresse ID: ${addressId} du client ID: ${customerId}`);
+    console.log('Données mises à jour:', updatedAddress);
+
+    const { address_line1, address_line2, city, state, zip_code, country } = updatedAddress;
+
+    try {
+        const connection = await db.getConnection();
+
+        const [result] = await connection.query(
+            'UPDATE addresses SET address_line1 = ?, address_line2 = ?, city = ?, state = ?, zip_code = ?, country = ? WHERE customer_id = ? AND id = ?',
+            [address_line1, address_line2, city, state, zip_code, country, customerId, addressId]
+        );
+
+        connection.release();
+
+        if (result.affectedRows === 0) {
+            console.log(`Adresse ID: ${addressId} du client ID: ${customerId} non trouvée.`);
+            return res.status(404).send({ message: 'Adresse non trouvée' });
+        }
+
+        console.log(`Adresse ID: ${addressId} du client ID: ${customerId} mise à jour avec succès.`);
+        res.send({ message: 'Adresse mise à jour avec succès' });
+    } catch (error) {
+        console.error('Erreur lors de la mise à jour de l\'adresse:', error);
+        res.status(500).send({ message: 'Erreur lors de la mise à jour de l\'adresse' });
+    }
+});
+
+// Route pour ajouter une nouvelle adresse à un client
+router.post('/api/customers/:customerId/addresses', async (req, res) => {
+    const customerId = req.params.customerId;
+    const newAddress = req.body;
+
+    console.log(`Requête de création reçue pour une nouvelle adresse du client ID: ${customerId}`);
+    console.log('Données de la nouvelle adresse:', newAddress);
+
+    const { type, address_line1, address_line2, city, state, zip_code, country } = newAddress;
+
+    try {
+        const connection = await db.getConnection();
+
+        const [result] = await connection.query(
+            'INSERT INTO addresses (customer_id, type, address_line1, address_line2, city, state, zip_code, country) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+            [customerId, type, address_line1, address_line2, city, state, zip_code, country]
+        );
+
+        connection.release();
+
+        if (result.affectedRows === 0) {
+            console.log(`Erreur lors de l'ajout de la nouvelle adresse pour le client ID: ${customerId}.`);
+            return res.status(500).send({ message: 'Erreur lors de l\'ajout de la nouvelle adresse' });
+        }
+
+        console.log(`Nouvelle adresse ajoutée avec succès pour le client ID: ${customerId}.`);
+        res.send({ id: result.insertId, message: 'Nouvelle adresse ajoutée avec succès' });
+    } catch (error) {
+        console.error('Erreur lors de l\'ajout de la nouvelle adresse:', error);
+        res.status(500).send({ message: 'Erreur lors de l\'ajout de la nouvelle adresse' });
+    }
+});
+
+// Route pour supprimer une adresse d'un client
+router.delete('/api/customers/:customerId/addresses/:addressId', async (req, res) => {
+    const customerId = req.params.customerId;
+    const addressId = req.params.addressId;
+
+    console.log(`Requête de suppression reçue pour l'adresse ID: ${addressId} du client ID: ${customerId}`);
+
+    try {
+        const connection = await db.getConnection();
+
+        const [result] = await connection.query(
+            'DELETE FROM addresses WHERE customer_id = ? AND id = ?',
+            [customerId, addressId]
+        );
+
+        connection.release();
+
+        if (result.affectedRows === 0) {
+            console.log(`Adresse ID: ${addressId} du client ID: ${customerId} non trouvée.`);
+            return res.status(404).send({ message: 'Adresse non trouvée' });
+        }
+
+        console.log(`Adresse ID: ${addressId} du client ID: ${customerId} supprimée avec succès.`);
+        res.send({ message: 'Adresse supprimée avec succès' });
+    } catch (error) {
+        console.error('Erreur lors de la suppression de l\'adresse:', error);
+        res.status(500).send({ message: 'Erreur lors de la suppression de l\'adresse' });
+    }
+});
+
+// Route pour ajouter un nouveau contact à un client
+router.post('/api/customers/:customerId/contacts', async (req, res) => {
+    const customerId = req.params.customerId;
+    const newContact = req.body;
+
+    console.log(`Requête de création reçue pour un nouveau contact du client ID: ${customerId}`);
+    console.log('Données du nouveau contact:', newContact);
+
+    const { name, phone_number, email, direct_phone } = newContact;
+
+    try {
+        const connection = await db.getConnection();
+
+        const [result] = await connection.query(
+            'INSERT INTO contacts (customer_id, name, phone_number, email, direct_phone) VALUES (?, ?, ?, ?, ?)',
+            [customerId, name, phone_number, email, direct_phone]
+        );
+
+        connection.release();
+
+        if (result.affectedRows === 0) {
+            console.log(`Erreur lors de l'ajout du nouveau contact pour le client ID: ${customerId}.`);
+            return res.status(500).send({ message: 'Erreur lors de l\'ajout du nouveau contact' });
+        }
+
+        console.log(`Nouveau contact ajouté avec succès pour le client ID: ${customerId}.`);
+        res.send({ id: result.insertId, message: 'Nouveau contact ajouté avec succès' });
+    } catch (error) {
+        console.error('Erreur lors de l\'ajout du nouveau contact:', error);
+        res.status(500).send({ message: 'Erreur lors de l\'ajout du nouveau contact' });
+    }
+});
+
+// Route pour mettre à jour un contact d'un client
+router.put('/api/customers/:customerId/contacts/:contactId', async (req, res) => {
+    const customerId = req.params.customerId;
+    const contactId = req.params.contactId;
+    const updatedContact = req.body;
+
+    console.log(`Requête de mise à jour reçue pour le contact ID: ${contactId} du client ID: ${customerId}`);
+    console.log('Données mises à jour:', updatedContact);
+
+    const { name, phone_number, email, direct_phone } = updatedContact;
+
+    try {
+        const connection = await db.getConnection();
+
+        const [result] = await connection.query(
+            'UPDATE contacts SET name = ?, phone_number = ?, email = ?, direct_phone = ? WHERE customer_id = ? AND id = ?',
+            [name, phone_number, email, direct_phone, customerId, contactId]
+        );
+
+        connection.release();
+
+        if (result.affectedRows === 0) {
+            console.log(`Contact ID: ${contactId} du client ID: ${customerId} non trouvé.`);
+            return res.status(404).send({ message: 'Contact non trouvé' });
+        }
+
+        console.log(`Contact ID: ${contactId} du client ID: ${customerId} mis à jour avec succès.`);
+        res.send({ message: 'Contact mis à jour avec succès' });
+    } catch (error) {
+        console.error('Erreur lors de la mise à jour du contact:', error);
+        res.status(500).send({ message: 'Erreur lors de la mise à jour du contact' });
+    }
+});
+
+// Route pour supprimer un contact d'un client
+router.delete('/api/customers/:customerId/contacts/:contactId', async (req, res) => {
+    const customerId = req.params.customerId;
+    const contactId = req.params.contactId;
+
+    console.log(`Requête de suppression reçue pour le contact ID: ${contactId} du client ID: ${customerId}`);
+
+    try {
+        const connection = await db.getConnection();
+
+        const [result] = await connection.query(
+            'DELETE FROM contacts WHERE customer_id = ? AND id = ?',
+            [customerId, contactId]
+        );
+
+        connection.release();
+
+        if (result.affectedRows === 0) {
+            console.log(`Contact ID: ${contactId} du client ID: ${customerId} non trouvé.`);
+            return res.status(404).send({ message: 'Contact non trouvé' });
+        }
+
+        console.log(`Contact ID: ${contactId} du client ID: ${customerId} supprimé avec succès.`);
+        res.send({ message: 'Contact supprimé avec succès' });
+    } catch (error) {
+        console.error('Erreur lors de la suppression du contact:', error);
+        res.status(500).send({ message: 'Erreur lors de la suppression du contact' });
+    }
+});
+
+// Route pour ajouter une nouvelle méthode de communication à un client
+router.post('/api/customers/:customerId/communicationMethods', async (req, res) => {
+    const customerId = req.params.customerId;
+    const newMethod = req.body;
+
+    console.log(`Requête de création reçue pour une nouvelle méthode de communication du client ID: ${customerId}`);
+    console.log('Données de la nouvelle méthode de communication:', newMethod);
+
+    const { method_type, details } = newMethod;
+
+    try {
+        const connection = await db.getConnection();
+
+        const [result] = await connection.query(
+            'INSERT INTO communication_methods (customer_id, method_type, details) VALUES (?, ?, ?)',
+            [customerId, method_type, details]
+        );
+
+        connection.release();
+
+        if (result.affectedRows === 0) {
+            console.log(`Erreur lors de l'ajout de la nouvelle méthode de communication pour le client ID: ${customerId}.`);
+            return res.status(500).send({ message: 'Erreur lors de l\'ajout de la nouvelle méthode de communication' });
+        }
+
+        console.log(`Nouvelle méthode de communication ajoutée avec succès pour le client ID: ${customerId}.`);
+        res.send({ id: result.insertId, message: 'Nouvelle méthode de communication ajoutée avec succès' });
+    } catch (error) {
+        console.error('Erreur lors de l\'ajout de la nouvelle méthode de communication:', error);
+        res.status(500).send({ message: 'Erreur lors de l\'ajout de la nouvelle méthode de communication' });
+    }
+});
+
+// Route pour mettre à jour une méthode de communication d'un client
+router.put('/api/customers/:customerId/communicationMethods/:methodId', async (req, res) => {
+    const customerId = req.params.customerId;
+    const methodId = req.params.methodId;
+    const updatedMethod = req.body;
+
+    console.log(`Requête de mise à jour reçue pour la méthode de communication ID: ${methodId} du client ID: ${customerId}`);
+    console.log('Données mises à jour:', updatedMethod);
+
+    const { method_type, details } = updatedMethod;
+
+    try {
+        const connection = await db.getConnection();
+
+        const [result] = await connection.query(
+            'UPDATE communication_methods SET method_type = ?, details = ? WHERE customer_id = ? AND id = ?',
+            [method_type, details, customerId, methodId]
+        );
+
+        connection.release();
+
+        if (result.affectedRows === 0) {
+            console.log(`Méthode de communication ID: ${methodId} du client ID: ${customerId} non trouvée.`);
+            return res.status(404).send({ message: 'Méthode de communication non trouvée' });
+        }
+
+        console.log(`Méthode de communication ID: ${methodId} du client ID: ${customerId} mise à jour avec succès.`);
+        res.send({ message: 'Méthode de communication mise à jour avec succès' });
+    } catch (error) {
+        console.error('Erreur lors de la mise à jour de la méthode de communication:', error);
+        res.status(500).send({ message: 'Erreur lors de la mise à jour de la méthode de communication' });
+    }
+});
+
+// Route pour supprimer une méthode de communication d'un client
+router.delete('/api/customers/:customerId/communicationMethods/:methodId', async (req, res) => {
+    const customerId = req.params.customerId;
+    const methodId = req.params.methodId;
+
+    console.log(`Requête de suppression reçue pour la méthode de communication ID: ${methodId} du client ID: ${customerId}`);
+
+    try {
+        const connection = await db.getConnection();
+
+        const [result] = await connection.query(
+            'DELETE FROM communication_methods WHERE customer_id = ? AND id = ?',
+            [customerId, methodId]
+        );
+
+        connection.release();
+
+        if (result.affectedRows === 0) {
+            console.log(`Méthode de communication ID: ${methodId} du client ID: ${customerId} non trouvée.`);
+            return res.status(404).send({ message: 'Méthode de communication non trouvée' });
+        }
+
+        console.log(`Méthode de communication ID: ${methodId} du client ID: ${customerId} supprimée avec succès.`);
+        res.send({ message: 'Méthode de communication supprimée avec succès' });
+    } catch (error) {
+        console.error('Erreur lors de la suppression de la méthode de communication:', error);
+        res.status(500).send({ message: 'Erreur lors de la suppression de la méthode de communication' });
+    }
+});
+
+export default router;

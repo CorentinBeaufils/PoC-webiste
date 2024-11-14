@@ -49,12 +49,12 @@ async function loadCustomerDetails(customerId) {
         }
     } catch (error) {
         console.error('Erreur lors du chargement des détails du client:', error);
-        showMessage('Erreur lors du chargement des détails du client.', true);
+        showMessage('Erreur lors du chargement des détails du client:', true);
     }
 }
 
 function displayCustomerList(customers) {
-    const customerListContainer = document.getElementById('customerList');
+    const customerListContainer = document.getElementById('customerContainer');
     customerListContainer.innerHTML = ''; // Réinitialiser la liste
 
     customers.forEach(customer => {
@@ -78,8 +78,9 @@ function displayCustomerDetails(customer) {
     // Affichage des infos clients de base
     const customerInfo = document.getElementById('detailsCustomerInfo');
     customerInfo.innerHTML = `
-        <p><strong>Nom :</strong> ${customer.name}</p>
-        <p><strong>Notes :</strong> ${customer.notes}</p>
+        <p><strong>Nom :</strong> <span id="customerName">${customer.name}</span></p>
+        <p><strong>Notes :</strong> <span id="customerNotes">${customer.notes}</span></p>
+        <button onclick="editCustomerInfo()">Modifier</button>
     `;
 
     // Affichage des adresses
@@ -89,7 +90,7 @@ function displayCustomerDetails(customer) {
         console.log('Addresses: ', customer.addresses);
         customer.addresses.forEach((address, index) => {
             const addressDiv = document.createElement('div');
-            addressDiv.classList.add('address-item');
+            addressDiv.classList.add('address-block');
             addressDiv.innerHTML = `
                 <p><strong>Type :</strong> ${address.type === 'main' ? 'Principale' : 'Annexe'}</p>
                 <p><strong>Adresse :</strong> ${address.address_line1}, ${address.address_line2}, ${address.city}, ${address.state}, ${address.zip_code}, ${address.country}</p>
@@ -109,12 +110,13 @@ function displayCustomerDetails(customer) {
         console.log('Contacts: ', customer.contacts);
         customer.contacts.forEach((contact, index) => {
             const contactDiv = document.createElement('div');
-            contactDiv.classList.add('contact-item');
+            contactDiv.classList.add('contact-block');
             contactDiv.innerHTML = `
                 <p><strong>Nom :</strong> ${contact.name}</p>
                 <p><strong>Téléphone :</strong> ${contact.phone_number}</p>
                 <p><strong>Email :</strong> ${contact.email}</p>
                 <p><strong>Téléphone Direct :</strong> ${contact.direct_phone}</p>
+                <button onclick="editContact(${index})">Modifier</button>
                 <button onclick="removeContact(${index})">Supprimer</button>
             `;
             contactsContainer.appendChild(contactDiv);
@@ -130,10 +132,11 @@ function displayCustomerDetails(customer) {
         console.log('Communication Methods: ', customer.communicationMethods);
         customer.communicationMethods.forEach((method, index) => {
             const methodDiv = document.createElement('div');
-            methodDiv.classList.add('communication-method-item');
+            methodDiv.classList.add("communication-method-block");
             methodDiv.innerHTML = `
                 <p><strong>Type :</strong> ${method.method_type}</p>
                 <p><strong>Détails :</strong> ${method.details}</p>
+                <button onclick="editCommunicationMethod(${index})">Modifier</button>
                 <button onclick="removeCommunicationMethod(${index})">Supprimer</button>
             `;
             communicationMethodsContainer.appendChild(methodDiv);
@@ -144,6 +147,53 @@ function displayCustomerDetails(customer) {
 
     // Afficher les détails du client
     document.getElementById('customerDetails').style.display = 'block';
+}
+
+function editCustomerInfo() {
+    const customerInfo = document.getElementById('detailsCustomerInfo');
+    customerInfo.innerHTML = `
+        <label for="editCustomerName">Nom :</label>
+        <input type="text" id="editCustomerName" value="${currentCustomer.name}" required>
+
+        <label for="editCustomerNotes">Notes :</label>
+        <textarea id="editCustomerNotes">${currentCustomer.notes}</textarea>
+
+        <button onclick="saveCustomerInfo()">Enregistrer</button>
+        <button onclick="cancelEditCustomerInfo()">Annuler</button>
+    `;
+}
+
+function saveCustomerInfo() {
+    const newName = document.getElementById('editCustomerName').value;
+    const newNotes = document.getElementById('editCustomerNotes').value;
+
+    currentCustomer.name = newName;
+    currentCustomer.notes = newNotes;
+
+    // Envoyer les données mises à jour au serveur
+    fetch(`/api/customers/${currentCustomer.id}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(currentCustomer)
+    })
+        .then(response => {
+            if (response.ok) {
+                displayCustomerDetails(currentCustomer);
+                showMessage('Informations du client mises à jour avec succès.');
+            } else {
+                showMessage('Erreur lors de la mise à jour des informations du client.', true);
+            }
+        })
+        .catch(error => {
+            console.error('Erreur lors de la mise à jour des informations du client:', error);
+            showMessage('Erreur lors de la mise à jour des informations du client.', true);
+        });
+}
+
+function cancelEditCustomerInfo() {
+    displayCustomerDetails(currentCustomer);
 }
 
 // 4. Gestion des Adresses
@@ -175,6 +225,8 @@ function addNewAddressBlock() {
         <input type="text" name="country">
 
         <button onclick="saveNewAddress(this)">Enregistrer</button>
+        <button onclick="cancelEditAddress(this)">Annuler</button>
+        
     `;
     document.getElementById('detailsAddressesContainer').appendChild(addressBlock);
 }
@@ -183,20 +235,41 @@ function saveNewAddress(button) {
     const addressBlock = button.parentElement;
 
     const newAddress = {
-        type: addressBlock.querySelector('select[name="type"]').value,
-        address_line1: addressBlock.querySelector('input[name="address_line1"]').value,
-        address_line2: addressBlock.querySelector('input[name="address_line2"]').value,
-        city: addressBlock.querySelector('input[name="city"]').value,
-        state: addressBlock.querySelector('input[name="state"]').value,
-        zip_code: addressBlock.querySelector('input[name="zip_code"]').value,
-        country: addressBlock.querySelector('input[name="country"]').value
+        type: normalizeFieldValue(addressBlock.querySelector('select[name="type"]').value),
+        address_line1: normalizeFieldValue(addressBlock.querySelector('input[name="address_line1"]').value),
+        address_line2: normalizeFieldValue(addressBlock.querySelector('input[name="address_line2"]').value),
+        city: normalizeFieldValue(addressBlock.querySelector('input[name="city"]').value),
+        state: normalizeFieldValue(addressBlock.querySelector('input[name="state"]').value),
+        zip_code: normalizeFieldValue(addressBlock.querySelector('input[name="zip_code"]').value),
+        country: normalizeFieldValue(addressBlock.querySelector('input[name="country"]').value)
     };
 
-    // Ajoutez la nouvelle adresse à l'objet customer
-    currentCustomer.addresses.push(newAddress);
+    // Envoyer les données de la nouvelle adresse au serveur
+    fetch(`/api/customers/${currentCustomer.id}/addresses`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(newAddress)
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.id) {
+                // Ajoutez la nouvelle adresse à l'objet customer avec l'ID retourné par le serveur
+                newAddress.id = data.id;
+                currentCustomer.addresses.push(newAddress);
 
-    // Réaffichez les détails du client
-    displayCustomerDetails(currentCustomer);
+                // Réaffichez les détails du client
+                displayCustomerDetails(currentCustomer);
+                showMessage('Nouvelle adresse ajoutée avec succès.');
+            } else {
+                showMessage('Erreur lors de l\'ajout de la nouvelle adresse.', true);
+            }
+        })
+        .catch(error => {
+            console.error('Erreur lors de l\'ajout de la nouvelle adresse:', error);
+            showMessage('Erreur lors de l\'ajout de la nouvelle adresse.', true);
+        });
 }
 
 function editAddress(index) {
@@ -231,6 +304,7 @@ function editAddress(index) {
         <input type="text" name="country" value="${address.country}">
 
         <button onclick="saveAddress(${index})">Enregistrer</button>
+        <button onclick="cancelEditAddress(${index})">Annuler</button>
         ${address.type !== 'main' ? `<button onclick="removeAddress(${index})">Supprimer</button>` : ''}
     `;
 }
@@ -239,32 +313,77 @@ function saveAddress(index) {
     const customer = currentCustomer; // Utiliser la variable globale
     const addressesContainer = document.getElementById('detailsAddressesContainer');
     const addressDiv = addressesContainer.children[index];
+    const addressId = customer.addresses[index].id; // Assurez-vous que chaque adresse a un identifiant unique
 
     const updatedAddress = {
         type: customer.addresses[index].type, // Ne pas permettre la modification du type
-        address_line1: addressDiv.querySelector('input[name="address_line1"]').value,
-        address_line2: addressDiv.querySelector('input[name="address_line2"]').value,
-        city: addressDiv.querySelector('input[name="city"]').value,
-        state: addressDiv.querySelector('input[name="state"]').value,
-        zip_code: addressDiv.querySelector('input[name="zip_code"]').value,
-        country: addressDiv.querySelector('input[name="country"]').value
+        address_line1: normalizeFieldValue(addressDiv.querySelector('input[name="address_line1"]').value),
+        address_line2: normalizeFieldValue(addressDiv.querySelector('input[name="address_line2"]').value),
+        city: normalizeFieldValue(addressDiv.querySelector('input[name="city"]').value),
+        state: normalizeFieldValue(addressDiv.querySelector('input[name="state"]').value),
+        zip_code: normalizeFieldValue(addressDiv.querySelector('input[name="zip_code"]').value),
+        country: normalizeFieldValue(addressDiv.querySelector('input[name="country"]').value)
     };
 
     // Mettez à jour l'adresse dans l'objet customer
     customer.addresses[index] = updatedAddress;
 
-    // Réaffichez les détails du client
-    displayCustomerDetails(customer);
+    // Envoyer les données mises à jour au serveur
+    fetch(`/api/customers/${customer.id}/addresses/${addressId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updatedAddress)
+    })
+        .then(response => {
+            if (response.ok) {
+                displayCustomerDetails(customer);
+                showMessage('Adresse mise à jour avec succès.');
+            } else {
+                showMessage('Erreur lors de la mise à jour de l\'adresse.', true);
+            }
+        })
+        .catch(error => {
+            console.error('Erreur lors de la mise à jour de l\'adresse:', error);
+            showMessage('Erreur lors de la mise à jour de l\'adresse.', true);
+        });
+}
+
+function cancelEditAddress(index) {
+    displayCustomerDetails(currentCustomer);
 }
 
 function removeAddress(index) {
     const customer = currentCustomer; // Utiliser la variable globale
+    const addressId = customer.addresses[index].id; // Assurez-vous que chaque adresse a un identifiant unique
+
     if (customer.addresses[index].type === 'main') {
         alert("Vous ne pouvez pas supprimer l'adresse principale.");
         return;
     }
-    customer.addresses.splice(index, 1);
-    displayCustomerDetails(customer);
+
+    // Envoyer la requête de suppression au serveur
+    fetch(`/api/customers/${customer.id}/addresses/${addressId}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+        .then(response => {
+            if (response.ok) {
+                // Supprimez l'adresse de l'objet customer
+                customer.addresses.splice(index, 1);
+                displayCustomerDetails(customer);
+                showMessage('Adresse supprimée avec succès.');
+            } else {
+                showMessage('Erreur lors de la suppression de l\'adresse.', true);
+            }
+        })
+        .catch(error => {
+            console.error('Erreur lors de la suppression de l\'adresse:', error);
+            showMessage('Erreur lors de la suppression de l\'adresse.', true);
+        });
 }
 
 // 5. Gestion des Contacts
@@ -284,14 +403,156 @@ function addNewContactBlock() {
         <label>Téléphone Direct :</label>
         <input type="tel" name="direct_phone">
 
-        <button onclick="removeContactBlock(this)">Supprimer</button>
+        <button onclick="saveNewContact(this)">Enregistrer</button>
+        <button onclick="removeContactBlock(this)">Annuler</button>
     `;
     document.getElementById('detailsContactsContainer').appendChild(contactBlock);
 }
 
-function removeContact(index) {
+function saveNewContact(button) {
+    const contactBlock = button.parentElement;
+
+    const newContact = {
+        name: normalizeFieldValue(contactBlock.querySelector('input[name="name"]').value),
+        phone_number: normalizeFieldValue(contactBlock.querySelector('input[name="phone_number"]').value),
+        email: normalizeFieldValue(contactBlock.querySelector('input[name="email"]').value),
+        direct_phone: normalizeFieldValue(contactBlock.querySelector('input[name="direct_phone"]').value)
+    };
+
+    // Si direct_phone est null, il prendra la valeur de phone_number et inversement
+    if (!newContact.direct_phone) {
+        newContact.direct_phone = newContact.phone_number;
+    } else if (!newContact.phone_number) {
+        newContact.phone_number = newContact.direct_phone;
+    }
+
+    // Envoyer les données du nouveau contact au serveur
+    fetch(`/api/customers/${currentCustomer.id}/contacts`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(newContact)
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.id) {
+                // Ajoutez le nouveau contact à l'objet customer avec l'ID retourné par le serveur
+                newContact.id = data.id;
+                currentCustomer.contacts.push(newContact);
+
+                // Réaffichez les détails du client
+                displayCustomerDetails(currentCustomer);
+                showMessage('Nouveau contact ajouté avec succès.');
+            } else {
+                showMessage('Erreur lors de l\'ajout du nouveau contact.', true);
+            }
+        })
+        .catch(error => {
+            console.error('Erreur lors de l\'ajout du nouveau contact:', error);
+            showMessage('Erreur lors de l\'ajout du nouveau contact.', true);
+        });
+}
+
+function editContact(index) {
+    const customer = currentCustomer; // Utiliser la variable globale
     const contactsContainer = document.getElementById('detailsContactsContainer');
-    contactsContainer.removeChild(contactsContainer.children[index]);
+    const contactDiv = contactsContainer.children[index];
+    const contact = customer.contacts[index];
+
+    contactDiv.innerHTML = `
+        <label>Nom du Contact :</label>
+        <input type="text" name="name" value="${contact.name}" required>
+
+        <label>Numéro de Téléphone :</label>
+        <input type="tel" name="phone_number" value="${contact.phone_number}">
+
+        <label>Email :</label>
+        <input type="email" name="email" value="${contact.email}">
+
+        <label>Téléphone Direct :</label>
+        <input type="tel" name="direct_phone" value="${contact.direct_phone}">
+
+        <button onclick="saveContact(${index})">Enregistrer</button>
+        <button onclick="cancelEditContact(${index})">Annuler</button>
+        <button onclick="removeContact(${index})">Supprimer</button>
+    `;
+}
+
+function saveContact(index) {
+    const customer = currentCustomer; // Utiliser la variable globale
+    const contactsContainer = document.getElementById('detailsContactsContainer');
+    const contactDiv = contactsContainer.children[index];
+    const contactId = customer.contacts[index].id; // Assurez-vous que chaque contact a un identifiant unique
+
+    const updatedContact = {
+        name: normalizeFieldValue(contactDiv.querySelector('input[name="name"]').value),
+        phone_number: normalizeFieldValue(contactDiv.querySelector('input[name="phone_number"]').value),
+        email: normalizeFieldValue(contactDiv.querySelector('input[name="email"]').value),
+        direct_phone: normalizeFieldValue(contactDiv.querySelector('input[name="direct_phone"]').value)
+    };
+
+    // Si direct_phone est null, il prendra la valeur de phone_number et inversement
+    if (!updatedContact.direct_phone) {
+        updatedContact.direct_phone = updatedContact.phone_number;
+    } else if (!updatedContact.phone_number) {
+        updatedContact.phone_number = updatedContact.direct_phone;
+    }
+
+    // Mettez à jour le contact dans l'objet customer
+    customer.contacts[index] = updatedContact;
+
+    // Envoyer les données mises à jour au serveur
+    fetch(`/api/customers/${customer.id}/contacts/${contactId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updatedContact)
+    })
+        .then(response => {
+            if (response.ok) {
+                displayCustomerDetails(customer);
+                showMessage('Contact mis à jour avec succès.');
+            } else {
+                showMessage('Erreur lors de la mise à jour du contact.', true);
+            }
+        })
+        .catch(error => {
+            console.error('Erreur lors de la mise à jour du contact:', error);
+            showMessage('Erreur lors de la mise à jour du contact.', true);
+        });
+}
+
+function cancelEditContact(index) {
+    displayCustomerDetails(currentCustomer);
+}
+
+function removeContact(index) {
+    const customer = currentCustomer; // Utiliser la variable globale
+    const contactId = customer.contacts[index].id; // Assurez-vous que chaque contact a un identifiant unique
+
+    // Envoyer la requête de suppression au serveur
+    fetch(`/api/customers/${customer.id}/contacts/${contactId}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+        .then(response => {
+            if (response.ok) {
+                // Supprimez le contact de l'objet customer
+                customer.contacts.splice(index, 1);
+                displayCustomerDetails(customer);
+                showMessage('Contact supprimé avec succès.');
+            } else {
+                showMessage('Erreur lors de la suppression du contact.', true);
+            }
+        })
+        .catch(error => {
+            console.error('Erreur lors de la suppression du contact:', error);
+            showMessage('Erreur lors de la suppression du contact.', true);
+        });
 }
 
 function removeContactBlock(button) {
@@ -300,7 +561,7 @@ function removeContactBlock(button) {
 }
 
 // 6. Gestion des Méthodes de Communication
-function addNewCommunicationMethodBlock() {
+function addCommunicationMethodBlock() {
     const methodBlock = document.createElement('div');
     methodBlock.classList.add('communication-method-block');
     methodBlock.innerHTML = `
@@ -310,31 +571,149 @@ function addNewCommunicationMethodBlock() {
         <label>Détails :</label>
         <input type="text" name="details" required>
 
-        <button onclick="saveNewCommunicationMethod(this)">Enregistrer</button>
+        <button onclick="saveCommunicationMethod(this)">Enregistrer</button>
+        <button onclick="removeCommunicationMethodBlock(this)">Annuler</button>
     `;
     document.getElementById('detailsCommunicationMethodsContainer').appendChild(methodBlock);
 }
 
-function saveNewCommunicationMethod(button) {
-    const methodBlock = button.parentElement;
-
-    const newMethod = {
-        method_type: methodBlock.querySelector('input[name="method_type"]').value,
-        details: methodBlock.querySelector('input[name="details"]').value
-    };
-
-    // Ajoutez la nouvelle méthode de communication à l'objet customer
-    currentCustomer.communicationMethods.push(newMethod);
-
-    // Réaffichez les détails du client
-    displayCustomerDetails(currentCustomer);
+function removeCommunicationMethodBlock(button) {
+    const communicationtBlock = button.parentElement;
+    communicationtBlock.remove();
 }
+
 
 function removeCommunicationMethod(index) {
     const customer = currentCustomer; // Utiliser la variable globale
-    customer.communicationMethods.splice(index, 1);
-    displayCustomerDetails(customer);
+    const methodId = customer.communicationMethods[index].id; // Assurez-vous que chaque méthode de communication a un identifiant unique
+
+    // Envoyer la requête de suppression au serveur
+    fetch(`/api/customers/${customer.id}/communicationMethods/${methodId}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (response.ok) {
+            // Supprimez la méthode de communication de l'objet customer
+            customer.communicationMethods.splice(index, 1);
+            displayCustomerDetails(customer);
+            showMessage('Méthode de communication supprimée avec succès.');
+        } else {
+            showMessage('Erreur lors de la suppression de la méthode de communication.', true);
+        }
+    })
+    .catch(error => {
+        console.error('Erreur lors de la suppression de la méthode de communication:', error);
+        showMessage('Erreur lors de la suppression de la méthode de communication.', true);
+    });
 }
+
+function saveCommunicationMethod(button) {
+    const methodBlock = button.parentElement;
+
+    const newMethod = {
+        method_type: normalizeFieldValue(methodBlock.querySelector('input[name="method_type"]').value),
+        details: normalizeFieldValue(methodBlock.querySelector('input[name="details"]').value)
+    };
+
+    if (!newMethod.method_type) {
+        showMessage('Le type de méthode ne peut pas être vide.', true);
+        return;
+    }
+
+    // Envoyer les données de la nouvelle méthode de communication au serveur
+    fetch(`/api/customers/${currentCustomer.id}/communicationMethods`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(newMethod)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.id) {
+            // Ajoutez la nouvelle méthode de communication à l'objet customer avec l'ID retourné par le serveur
+            newMethod.id = data.id;
+            currentCustomer.communicationMethods.push(newMethod);
+
+            // Réaffichez les détails du client
+            displayCustomerDetails(currentCustomer);
+            showMessage('Nouvelle méthode de communication ajoutée avec succès.');
+        } else {
+            showMessage('Erreur lors de l\'ajout de la nouvelle méthode de communication.', true);
+        }
+    })
+    .catch(error => {
+        console.error('Erreur lors de l\'ajout de la nouvelle méthode de communication:', error);
+        showMessage('Erreur lors de l\'ajout de la nouvelle méthode de communication.', true);
+    });
+}
+
+function editCommunicationMethod(index) {
+    const customer = currentCustomer; // Utiliser la variable globale
+    const communicationMethodsContainer = document.getElementById('detailsCommunicationMethodsContainer');
+    const methodDiv = communicationMethodsContainer.children[index];
+    const method = customer.communicationMethods[index];
+
+    methodDiv.innerHTML = `
+        <label>Type de Méthode :</label>
+        <input type="text" name="method_type" value="${method.method_type}" required>
+
+        <label>Détails :</label>
+        <input type="text" name="details" value="${method.details}" required>
+
+        <button onclick="updateCommunicationMethod(${index})">Enregistrer</button>
+        <button onclick="cancelEditCommunicationMethod(${index})">Annuler</button>
+    `;
+}
+
+function updateCommunicationMethod(index) {
+    const customer = currentCustomer; // Utiliser la variable globale
+    const communicationMethodsContainer = document.getElementById('detailsCommunicationMethodsContainer');
+    const methodDiv = communicationMethodsContainer.children[index];
+    const methodId = customer.communicationMethods[index].id; // Assurez-vous que chaque méthode de communication a un identifiant unique
+
+    const updatedMethod = {
+        method_type: normalizeFieldValue(methodDiv.querySelector('input[name="method_type"]').value),
+        details: normalizeFieldValue(methodDiv.querySelector('input[name="details"]').value)
+    };
+
+    if (!updatedMethod.method_type) {
+        showMessage('Le type de méthode ne peut pas être vide.', true);
+        return;
+    }
+
+    // Mettez à jour la méthode de communication dans l'objet customer
+    customer.communicationMethods[index] = updatedMethod;
+
+    // Envoyer les données mises à jour au serveur
+    fetch(`/api/customers/${customer.id}/communicationMethods/${methodId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updatedMethod)
+    })
+    .then(response => {
+        if (response.ok) {
+            displayCustomerDetails(customer);
+            showMessage('Méthode de communication mise à jour avec succès.');
+        } else {
+            showMessage('Erreur lors de la mise à jour de la méthode de communication.', true);
+        }
+    })
+    .catch(error => {
+        console.error('Erreur lors de la mise à jour de la méthode de communication:', error);
+        showMessage('Erreur lors de la mise à jour de la méthode de communication.', true);
+    });
+}
+
+function cancelEditCommunicationMethod(index) {
+    displayCustomerDetails(currentCustomer);
+}
+
 
 // 7. Gestion des Sections
 function showSection(sectionId) {
