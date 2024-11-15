@@ -4,6 +4,11 @@ let addresses = [];
 let contacts = [];
 let communicationMethods = [];
 let currentCustomer = null;
+let currentPage = 1;
+const limit = 400;
+let isLoading = false;
+let hasMoreCustomers = true;
+let currentFilter = ''; // Variable pour stocker le filtre actuel
 
 // 2. Fonctions Utilitaires
 const showMessage = (message, isError = false) => {
@@ -21,19 +26,29 @@ function isBlockEmpty(block) {
 }
 
 // 3. Gestion des Clients
-async function loadCustomers() {
-    console.log('Chargement de la liste des clients...');
+// Fonction pour charger et afficher la liste des clients avec pagination
+async function loadCustomers(filter = '', page = 1, append = false) {
+    if (isLoading || !hasMoreCustomers) return;
+    isLoading = true;
+
     try {
-        const response = await fetch('/api/customers');
+        const response = await fetch(`/api/customers?name=${encodeURIComponent(filter)}&page=${page}&limit=${limit}`);
         if (response.ok) {
             const customers = await response.json();
-            displayCustomerList(customers);
+            if (customers.length < limit) {
+                hasMoreCustomers = false; // Arrêter le lazy loading si moins de clients que la limite sont retournés
+            }
+            displayCustomerList(customers, append);
+            currentPage = page;
+            currentFilter = filter; // Mettre à jour le filtre actuel
         } else {
             showMessage('Erreur lors du chargement des clients.', true);
         }
     } catch (error) {
         console.error('Erreur lors du chargement des clients:', error);
         showMessage('Erreur lors du chargement des clients.', true);
+    } finally {
+        isLoading = false;
     }
 }
 
@@ -44,6 +59,7 @@ async function loadCustomerDetails(customerId) {
             const customer = await response.json();
             console.log('Détails du client:', customer);
             displayCustomerDetails(customer);
+            document.getElementById('customerList').style.display = 'none'; // Masquer la section customerList
         } else {
             showMessage('Erreur lors du chargement des détails du client.', true);
         }
@@ -53,9 +69,12 @@ async function loadCustomerDetails(customerId) {
     }
 }
 
-function displayCustomerList(customers) {
+// Fonction pour afficher la liste des clients
+function displayCustomerList(customers, append) {
     const customerListContainer = document.getElementById('customerContainer');
-    customerListContainer.innerHTML = ''; // Réinitialiser la liste
+    if (!append) {
+        customerListContainer.innerHTML = ''; // Réinitialiser la liste si append est false
+    }
 
     customers.forEach(customer => {
         const listItem = document.createElement('div');
@@ -69,6 +88,13 @@ function displayCustomerList(customers) {
 
         customerListContainer.appendChild(listItem);
     });
+}
+
+// Fonction pour filtrer les clients par nom
+function filterCustomers() {
+    const filterName = document.getElementById('filterName').value;
+    hasMoreCustomers = true; // Réinitialiser le lazy loading lors de l'application d'un filtre
+    loadCustomers(filterName);
 }
 
 function displayCustomerDetails(customer) {
@@ -717,7 +743,7 @@ function cancelEditCommunicationMethod(index) {
 
 // 7. Gestion des Sections
 function showSection(sectionId) {
-    const sections = document.querySelectorAll('.customer-section');
+    const sections = document.querySelectorAll('.customer-section, .sub-section');
     sections.forEach(section => {
         section.style.display = section.id === sectionId ? 'block' : 'none';
     });
@@ -725,6 +751,8 @@ function showSection(sectionId) {
     // Charger la liste des clients si la section 'viewCustomers' est sélectionnée
     if (sectionId === 'viewCustomers') {
         loadCustomers();
+        document.getElementById('customerList').style.display = 'block'; // Réafficher la section customerList
+        document.getElementById('customerDetails').style.display = 'none'; // Masquer la section customerDetails
     }
 }
 
@@ -732,11 +760,43 @@ function showSection(sectionId) {
 document.getElementById('customerForm').addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const infosElements = document.querySelectorAll('.info-block');
-    infos = Array.from(infosElements).map(infoElement => {
+    // Collecter les informations de base du client
+    const infos = {
+        name: normalizeFieldValue(document.getElementById('customerName').value),
+        notes: normalizeFieldValue(document.getElementById('customerNotes').value)
+    };
+
+    // Collecter les adresses
+    const addressElements = document.querySelectorAll('#addressesContainer .address-block');
+    const addresses = Array.from(addressElements).map(addressElement => {
         return {
-            name: normalizeFieldValue(infoElement.querySelector('input[name="name"]').value),
-            notes: normalizeFieldValue(infoElement.querySelector('input[name="notes"]').value)
+            type: normalizeFieldValue(addressElement.querySelector('select[name="type"]').value),
+            address_line1: normalizeFieldValue(addressElement.querySelector('input[name="address_line1"]').value),
+            address_line2: normalizeFieldValue(addressElement.querySelector('input[name="address_line2"]').value),
+            city: normalizeFieldValue(addressElement.querySelector('input[name="city"]').value),
+            state: normalizeFieldValue(addressElement.querySelector('input[name="state"]').value),
+            zip_code: normalizeFieldValue(addressElement.querySelector('input[name="zip_code"]').value),
+            country: normalizeFieldValue(addressElement.querySelector('input[name="country"]').value)
+        };
+    });
+
+    // Collecter les contacts
+    const contactElements = document.querySelectorAll('#contactsContainer .contact-block');
+    const contacts = Array.from(contactElements).map(contactElement => {
+        return {
+            name: normalizeFieldValue(contactElement.querySelector('input[name="name"]').value),
+            phone_number: normalizeFieldValue(contactElement.querySelector('input[name="phone_number"]').value),
+            email: normalizeFieldValue(contactElement.querySelector('input[name="email"]').value),
+            direct_phone: normalizeFieldValue(contactElement.querySelector('input[name="direct_phone"]').value)
+        };
+    });
+
+    // Collecter les méthodes de communication
+    const methodElements = document.querySelectorAll('#communicationMethodForm .communication-method-block');
+    const communicationMethods = Array.from(methodElements).map(methodElement => {
+        return {
+            method_type: normalizeFieldValue(methodElement.querySelector('input[name="method_type"]').value),
+            details: normalizeFieldValue(methodElement.querySelector('input[name="details"]').value)
         };
     });
 
@@ -747,7 +807,7 @@ document.getElementById('customerForm').addEventListener('submit', async (e) => 
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ infos })
+            body: JSON.stringify({ infos, addresses, contacts, communicationMethods })
         });
 
         if (response.ok) {
@@ -764,6 +824,12 @@ document.getElementById('customerForm').addEventListener('submit', async (e) => 
 
 // 9. Initialisation
 document.addEventListener('DOMContentLoaded', () => {
-    // Charger la liste des clients au démarrage
     loadCustomers();
+
+    // Ajouter un écouteur de défilement pour le lazy loading
+    window.addEventListener('scroll', () => {
+        if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500) {
+            loadCustomers(currentFilter, currentPage + 1, true); // Utiliser le filtre actuel
+        }
+    });
 });

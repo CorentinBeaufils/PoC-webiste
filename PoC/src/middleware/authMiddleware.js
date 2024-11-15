@@ -1,21 +1,17 @@
-const verifierAdmin = (req, res, next) => {
-    // Vérifier si l'utilisateur est authentifié et a le rôle d'administrateur
-    if (req.session.user && req.session.user.role === 'admin') {
-        console.log('admin action with mail: ',req.session.user.email)
+export function verifierSession(req, res, next) {
+    if (req.session && req.session.user) {
+        console.log('Session active pour l\'utilisateur:', req.session.user);
         next();
     } else {
-        console.log('admin request with email',req.session.user.email);
-        res.status(403).json({ message: 'Accès refusé : réservée aux administrateurs.' });
+        console.log('Session non active');
+        res.status(401).send('Non autorisé');
     }
-};
+}
 
-
-const verifierSession = (req, res, next) => {
-    if (req.session.user) {
+export function verifierAdmin(req, res, next) {
+    if (req.session && req.session.user && req.session.user.role === 'admin') {
         next();
     } else {
-        res.redirect('/login'); // Redirige vers la page de connexion si la session n'existe pas
+        res.status(403).send('Accès interdit');
     }
-};
-
-export { verifierSession, verifierAdmin };
+}

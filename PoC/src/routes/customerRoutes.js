@@ -19,7 +19,7 @@ router.post('/api/customers', async (req, res) => {
         // 1. Insérer le client sans `main_address_id` pour l'instant
         const [customerResult] = await conn.query(
             'INSERT INTO customers (name, notes) VALUES (?, ?)',
-            [infos[0].name, infos[0].notes]
+            [infos.name, infos.notes]
         );
         const customerId = customerResult.insertId;
         console.log("Client inséré avec succès, ID :", customerId);
@@ -105,20 +105,32 @@ router.post('/api/customers', async (req, res) => {
 //route pour afficher les clients
 
 
-// Route pour obtenir la liste de tous les clients
+// Route pour obtenir la liste de tous les clients avec pagination
 router.get('/api/customers', async (req, res) => {
-    try {
-        // Récupérer la liste de tous les clients
-        const [customers] = await db.query('SELECT id, name, notes FROM customers');
+    const { name, page = 1, limit = 400 } = req.query;
 
-        if (customers.length === 0) {
-            return res.status(404).json({ message: 'Aucun client trouvé.' });
+    try {
+        const connection = await db.getConnection();
+
+        let query = 'SELECT * FROM customers';
+        const queryParams = [];
+
+        if (name) {
+            query += ' WHERE name LIKE ?';
+            queryParams.push(`${name}%`);
         }
+
+        query += ' LIMIT ? OFFSET ?';
+        queryParams.push(parseInt(limit), (parseInt(page) - 1) * parseInt(limit));
+
+        const [customers] = await connection.query(query, queryParams);
+
+        connection.release();
 
         res.json(customers);
     } catch (error) {
-        console.error('Erreur lors de la récupération de la liste des clients:', error);
-        res.status(500).json({ message: 'Erreur lors de la récupération de la liste des clients.' });
+        console.error('Erreur lors de la récupération des clients:', error);
+        res.status(500).json({ message: 'Erreur lors de la récupération des clients.' });
     }
 });
 

@@ -258,3 +258,17 @@ button[type="submit"]:hover {
     flex: 2;
     overflow-y: auto; /* Permet le défilement vertical si nécessaire */
 }
+
+/* Style pour le conteneur du bouton de retour */
+.return-button-container {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.return-button-container button {
+    background-color: #dc3545;
+}
+
+.return-button-container button:hover {
+    background-color: #c82333;
+}

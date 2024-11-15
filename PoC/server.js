@@ -8,6 +8,8 @@ import { dirname } from 'path';
 import { verifierSession, verifierAdmin } from './src/middleware/authMiddleware.js';
 import customerRoutes from './src/routes/customerRoutes.js'; // Chemin des routes clients
 import db from './src/db.js'; // Assurez-vous du chemin correct
+import bodyParser from 'body-parser';
+import userRoutes from './src/routes/userRoutes.js'; // Assurez-vous que le chemin est correct
 
 dotenv.config();
 
@@ -20,6 +22,17 @@ const __dirname = dirname(__filename);
 
 // Middleware pour analyser les données du formulaire
 app.use(express.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+// Configuration de la session
+app.use(session({
+    secret: process.env.ACCESS_TOKEN_SECRET, // Remplacez par une clé secrète
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false } // Mettez `true` si vous utilisez HTTPS en production
+}));
+
 // Configurer le moteur de vue EJS et le répertoire des vues
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'src/views'));
@@ -29,6 +42,7 @@ app.use(express.static(path.join(__dirname, 'src/public')));
 
 // Utilisez les routes pour les clients
 app.use(customerRoutes);
+app.use(userRoutes);
 
 
 // Fonction keep-alive pour éviter la déconnexion
@@ -46,14 +60,6 @@ const PORT = process.env.PORT || 3100;
 app.listen(PORT, () => {
     console.log(`Serveur démarré sur le port ${PORT}`);
 });
-
-
-app.use(session({
-    secret: process.env.ACCESS_TOKEN_SECRET, // Remplacez par une clé secrète
-    resave: false,
-    saveUninitialized: false,
-    cookie: { secure: false } // Mettez `true` si vous utilisez HTTPS en production
-}));
 
 
 app.post('/logout', (req, res) => {
@@ -152,6 +158,7 @@ app.post('/connexion', async (req, res) => {
         }
 
         const utilisateur = results[0];
+        console.log("Utilisateur trouvé :", utilisateur);
         const mot_de_passe_correct = await bcrypt.compare(mot_de_passe, utilisateur.mot_de_passe);
 
         if (!mot_de_passe_correct) {
@@ -162,6 +169,7 @@ app.post('/connexion', async (req, res) => {
         // Stocker les informations utilisateur dans la session
         req.session.user = {
             id: utilisateur.id,
+            nom : utilisateur.nom,
             email: utilisateur.email,
             role: utilisateur.role
         };
@@ -171,50 +179,5 @@ app.post('/connexion', async (req, res) => {
     } catch (err) {
         console.error("Erreur de serveur :", err);
         res.status(500).send('Erreur de serveur.');
-    }
-});
-
-
-// Route pour ajouter un dossier (nécessite que l'utilisateur soit connecté)
-app.post('/dossiers', verifierSession, async (req, res) => {
-    const { nom, description } = req.body;
-    const utilisateur_id = req.session.user.id; // L'utilisateur connecté
-
-    try {
-        const [result] = await  db.query(
-            'INSERT INTO dossiers (nom, description, utilisateur_id) VALUES (?, ?, ?)',
-            [nom, description, utilisateur_id]);
-            console.log('creation du dossier avec les parametres (nom,description,utilisateur_id) : ',nom,description,utilisateur_id);
-            res.status(201).json({ message: 'dossier créé avec succès.' });
-    } catch (err) {
-        console.error('Erreur lors de la création du dossier :', err);
-        res.status(500).json({ message: 'Erreur lors de la création du dossier.' });
-    }
-});
-
-
-// Route pour récupérer les dossiers (nécessite que l'utilisateur soit connecté)
-app.get('/dossiers', verifierSession, async (req, res) => {
-    console.log(`[${new Date().toISOString()}] Requête reçue pour /dossiers par l'utilisateur ID : ${req.session.user.id}`);
-
-    const limit = parseInt(req.query.limit) || 10;  // Nombre de dossiers à renvoyer
-    const offset = parseInt(req.query.offset) || 0;  // Décalage (offset) pour la pagination
-    console.log(`[${new Date().toISOString()}] Paramètres de requête: limit = ${limit}, offset = ${offset}`);
-
-    try {
-        // Log de début de requête
-        console.log(`[${new Date().toISOString()}] Tentative de récupération des dossiers depuis la base de données`);
-        
-        // Exécution de la requête avec log de démarrage et fin
-        const [results] = await db.query('SELECT * FROM dossiers LIMIT ? OFFSET ?', [limit, offset]);
-        
-        console.log(`[${new Date().toISOString()}] Requête /dossiers réussie. Nombre de dossiers récupérés: ${results.length}`);
-        
-        res.json(results);
-    } catch (err) {
-        console.error(`[${new Date().toISOString()}] Erreur dans la requête /dossiers:`, err);
-        res.status(500).json({ message: 'Erreur lors de la récupération des dossiers.' });
-    } finally {
-        console.log(`[${new Date().toISOString()}] Fin de traitement pour la requête /dossiers`);
     }
 });

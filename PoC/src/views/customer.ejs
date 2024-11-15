@@ -113,16 +113,20 @@
         <section id="viewCustomers" class="main-section customer-section" style="display: none;">
             <div id="customerList">
                 <h2>Liste des Clients</h2>
+                <div>
+                    <input type="text" id="filterName" placeholder="Filtrer par nom">
+                    <button onclick="filterCustomers()">Filtrer</button>
+                </div>
                 <div id="customerContainer"></div> <!-- Conteneur pour la liste des clients -->
             </div>
 
             <!-- Section pour afficher les détails d'un client -->
             <section id="customerDetails" class="sub-section" style="display: none;">
                 <h2>Détails du Client</h2>
-                <div id="detailsCustomerInfo" class = "info-block"></div>
+                <div id="detailsCustomerInfo" class="info-block"></div>
 
                 <h3>Adresses</h3>
-                <div id="detailsAddressesContainer" ></div>
+                <div id="detailsAddressesContainer"></div>
                 <button onclick="addNewAddressBlock()">Ajouter une adresse</button>
 
                 <h3>Contacts</h3>
@@ -130,10 +134,13 @@
                 <button onclick="addNewContactBlock()">Ajouter un contact</button>
 
                 <h3>Méthodes de Communication</h3>
-                <div id="detailsCommunicationMethodsContainer" ></div>
+                <div id="detailsCommunicationMethodsContainer"></div>
                 <button onclick="addCommunicationMethodBlock()">Ajouter une méthode de communication</button>
 
-                <button onclick="showSection('viewCustomers')">Retour à la liste des clients</button>
+                <!-- Conteneur pour le bouton de retour -->
+                <div class="return-button-container">
+                    <button onclick="showSection('viewCustomers')">Retour à la liste des clients</button>
+                </div>
             </section>
         </section>
 

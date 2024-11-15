@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profil Utilisateur</title>
-    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/user.css">
     <link rel="stylesheet" href="/css/navbar.css"> <!-- Inclure les styles de la barre de navigation -->
 </head>
 <body>
@@ -33,19 +33,49 @@
                     <p id="createMessage"></p>
                 </form>
 
-                <!-- Formulaire pour supprimer un utilisateur -->
-                <form id="deleteUserForm">
-                    <h4>Supprimer un utilisateur</h4>
-                    <input type="email" id="deleteEmail" placeholder="Email de l'utilisateur à supprimer" required>
-                    <button type="submit">Supprimer l'utilisateur</button>
-                    <p id="deleteMessage"></p>
-                </form>
+                <!-- Div pour afficher les utilisateurs -->
+                <div id="userList">
+                    <h3>Liste des utilisateurs</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Email</th>
+                                <th>Rôle</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users">
+                            <!-- Les utilisateurs seront ajoutés ici dynamiquement -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
         <% } %>
+    </div>
+
+    <!-- Modal pour modifier un utilisateur -->
+    <div id="editUserModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h3>Modifier l'utilisateur</h3>
+            <form id="editUserForm">
+                <input type="hidden" id="editEmail">
+                <label for="editNom">Nom:</label>
+                <input type="text" id="editNom" required>
+                <label for="editNewEmail">Email:</label>
+                <input type="email" id="editNewEmail" required>
+                <label for="editRole">Rôle:</label>
+                <select id="editRole">
+                    <option value="user">Utilisateur</option>
+                    <option value="admin">Administrateur</option>
+                </select>
+                <button type="submit">Mettre à jour</button>
+            </form>
+        </div>
     </div>
 
     <!-- Charger le fichier JavaScript séparé pour le profil utilisateur -->
     <script src="/js/user.js"></script>
 </body>
 </html>
-
