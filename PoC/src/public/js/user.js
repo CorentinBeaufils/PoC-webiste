@@ -98,8 +98,8 @@ async function fetchUsers() {
                 <td>${user.email}</td>
                 <td>${user.role}</td>
                 <td>
-                    <button onclick="openEditModal('${user.nom}', '${user.email}', '${user.role}')">Modifier</button>
-                    <button onclick="deleteUser('${user.email}')">Supprimer</button>
+                    <button onclick="openEditModal('${user.nom}', '${user.email}', '${user.role}')" class="userBtn">Modify</button>
+                    <button onclick="deleteUser('${user.email}')" class="userBtn">Delete</button>
                 </td>
             `;
             userList.appendChild(row);

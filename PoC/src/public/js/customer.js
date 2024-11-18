@@ -10,6 +10,7 @@ let isLoading = false;
 let hasMoreCustomers = true;
 let currentFilter = ''; // Variable pour stocker le filtre actuel
 
+
 // 2. Fonctions Utilitaires
 const showMessage = (message, isError = false) => {
     const messageElement = document.getElementById('message');
@@ -24,6 +25,17 @@ function normalizeFieldValue(value) {
 function isBlockEmpty(block) {
     return Object.values(block).every(value => value === null);
 }
+
+// Fonction de déconnexion
+document.getElementById('logoutButton')?.addEventListener('click', () => {
+    fetch('/logout', { method: 'POST' })
+        .then(() => {
+            window.location.href = '/login';
+        })
+        .catch(error => {
+            console.error('Erreur lors de la déconnexion:', error);
+        });
+});
 
 // 3. Gestion des Clients
 // Fonction pour charger et afficher la liste des clients avec pagination

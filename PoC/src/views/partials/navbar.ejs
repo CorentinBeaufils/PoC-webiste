@@ -1,10 +1,20 @@
 <!-- src/views/partials/navbar.ejs -->
 <nav class="navbar-main">
     <ul>
-        <li><a href="/user">Mon Profil</a></li>
-        <li><a href="/customer">Customer</a></li>
-        <li><a href="/dossier">Créer un Dossier</a></li>
-        <li><a href="/dossier_list">Voir les Dossiers</a></li>
-        <li><a href="#" id="logoutButton">Se Déconnecter</a></li>
+        <li><a href="/user"  class="navBtn <%= user.role !== 'admin' ? 'disabled' : '' %>">User/Admin</a></li>
+        <li><a href="/customer" class="navBtn">Customer</a></li>
+        <li><a href="/dossier" class="navBtn">Créer un Dossier</a></li>
+        <li><a href="/dossier_list" class="navBtn">Voir les Dossiers</a></li>
+        <li>
+            <div class="dropdown">
+                <button onclick="myFunction()" class="dropbtn">My profile</button>
+                <div id="myDropdown" class="dropdown-content">
+                    <span id="emailNavBar"><%= user.email %></span>
+                    <div id="separator"></div>
+                    <a href="#" id="logoutButton">Logout</a>
+                </div>
+              </div>
+        </li>
     </ul>
+    <script src="/js/navBar.js"></script>
 </nav>

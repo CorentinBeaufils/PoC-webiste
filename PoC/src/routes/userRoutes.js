@@ -5,7 +5,7 @@ import pool from '../db.js'; // Assurez-vous que le chemin est correct et que po
 const router = express.Router();
 
 // Route pour récupérer les informations des utilisateurs
-router.get('/get_users', verifierSession, verifierAdmin, async (req, res) => {
+router.get('/get_users', verifierSession, async (req, res) => {
     try {
         const [results] = await pool.query('SELECT nom, email, role FROM utilisateurs');
         res.json(results); // Renvoie les utilisateurs en réponse

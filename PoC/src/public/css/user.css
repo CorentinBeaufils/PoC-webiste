@@ -24,7 +24,7 @@ form {
     margin-bottom: 20px;
 }
 
-input, select, button {
+input, select, .userBtn {
     display: block;
     width: calc(100% - 22px); /* Ajustez la largeur pour tenir compte du padding et de la bordure */
     padding: 10px;
@@ -34,14 +34,14 @@ input, select, button {
     box-sizing: border-box; /* Assurez-vous que le padding et la bordure sont inclus dans la largeur totale */
 }
 
-button {
+.userBtn {
     background-color: #007bff;
     color: #fff;
     border: none;
     cursor: pointer;
 }
 
-button:hover {
+.userBtn:hover {
     background-color: #0056b3;
 }
 
@@ -115,4 +115,9 @@ th {
     color: black;
     text-decoration: none;
     cursor: pointer;
+}
+
+.disabled {
+    pointer-events: none;
+    opacity: 0.5;
 }

@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (response.ok) {
                 // Redirige vers la page /user en cas de succès
-                window.location.href = "/user";
+                window.location.href = "/customer";
             } else {
                 const errorText = await response.text();
                 alert("Erreur de connexion : " + errorText);

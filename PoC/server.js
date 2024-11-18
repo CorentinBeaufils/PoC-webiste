@@ -77,7 +77,7 @@ app.get('/login', (req, res) => {
     res.render('login');
 });
 
-app.get('/user', verifierSession, (req, res) => {
+app.get('/user', verifierSession,verifierAdmin, (req, res) => {
     res.render('user', { user: req.session.user });
 });
 
@@ -90,7 +90,7 @@ app.get('/dossier_list', verifierSession, (req, res) => {
 });
 
 app.get('/customer',verifierSession, (req,res) => {
-    res.render('customer');
+    res.render('customer', { user: req.session.user });
 });
 
 
@@ -175,7 +175,7 @@ app.post('/connexion', async (req, res) => {
         };
 
         console.log("Connexion réussie, redirection vers /user");
-        res.redirect('/user');
+        res.redirect('/customer');
     } catch (err) {
         console.error("Erreur de serveur :", err);
         res.status(500).send('Erreur de serveur.');
