@@ -1,0 +1,23 @@
+<!-- Modal personnalisé pour les contacts -->
+<div id="<%= modalId %>" class="custom-modal">
+    <div class="custom-modal-content">
+        <span class="custom-close" onclick="closeModal('<%= modalId %>')">&times;</span>
+        <h2><%= modalTitle %></h2>
+        <form id="<%= formId %>">
+            <label>Nom du Contact :</label>
+            <input type="text" name="name" required>
+
+            <label>Numéro de Téléphone :</label>
+            <input type="tel" name="phone_number">
+
+            <label>Email :</label>
+            <input type="email" name="email">
+
+            <label>Téléphone Direct :</label>
+            <input type="tel" name="direct_phone">
+
+            <button type="button" onclick="<%= saveFunction %>">Enregistrer</button>
+            <button type="button" onclick="closeModal('<%= modalId %>')">Annuler</button>
+        </form>
+    </div>
+</div>

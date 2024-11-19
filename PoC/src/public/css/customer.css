@@ -8,8 +8,8 @@ body {
 
 /* Style des sections */
 .main-section {
-    width: 100%;
-    max-width: 800px;
+    width: 80vw;
+    max-width: 1600px;
     background-color: #ffffff;
     padding: 20px;
     margin: 20px auto;
@@ -147,7 +147,7 @@ button[type="submit"]:hover {
 /* Styles pour les détails des clients */
 .customer-section {
     width: 90%;
-    max-width: 800px;
+    max-width: 1600px;
     background-color: #fff;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -209,9 +209,6 @@ button[type="submit"]:hover {
     margin-top: 20px;
 }
 
-.sub-section div {
-    margin-bottom: 10px;
-}
 
 .sub-section label {
     display: block;
@@ -271,4 +268,60 @@ button[type="submit"]:hover {
 
 .return-button-container button:hover {
     background-color: #c82333;
+}
+
+.customer-grid {
+    display: grid;
+    height: 200px;
+    overflow-y: auto;
+    grid-template-columns: repeat(auto-fill, minmax(100%, 1fr));
+    margin-bottom: 10px;
+    border: 1px solid #d8d8d8;
+    border-radius: 5px;
+}
+
+.customer-detail-address, .customer-detail-contact, .customer-communication-method {
+    display: grid;
+    grid-template-columns: 1fr 4fr 1fr; /* Trois colonnes : type/nom, détails, boutons */
+    padding: 10px;
+    border-radius: 5px;
+    max-height: 50px; /* Hauteur maximale de 50 pixels */
+    transition: background-color 0.3s ease; /* Transition pour un effet de changement de couleur en douceur */
+    cursor: pointer; /* Changer le curseur pour indiquer que la division est cliquable */
+}
+
+.customer-detail-address.header, .customer-detail-contact.header, .customer-communication-method.header {
+    background-color: #6c64e0; /* Couleur de fond pour l'en-tête */
+    font-weight: bold;
+    max-height: 30px; /* Hauteur maximale de 30 pixels pour l'en-tête */
+    align-items: center; /* Centrer verticalement */
+    justify-content: flex-start; /* Aligner à gauche */
+    padding-left: 10px; /* Ajouter un peu de padding à gauche pour l'espacement */
+}
+
+.customer-detail-address:not(.header):hover, .customer-detail-contact:not(.header):hover, .customer-communication-method:not(.header):hover {
+    background-color: #f0f0f0; /* Couleur de fond légèrement différente lors du survol */
+}
+
+.address-type, .contact-name, .customer-communication-method-type {
+    font-weight: bold;
+    max-height: 50px; /* Hauteur maximale de 50 pixels */
+    overflow: auto; /* Masquer le contenu qui dépasse */
+}
+
+.address-elements, .contact-details, .customer-communication-method-details {
+    margin-right: 10px;
+    max-height: 50px; /* Hauteur maximale de 50 pixels */
+    overflow: auto; /* Masquer le contenu qui dépasse */
+}
+
+.address-buttons, .contact-buttons, .customer-communication-method-buttons {
+    max-height: 50px; /* Hauteur maximale de 50 pixels */
+    overflow: auto; /* Masquer le contenu qui dépasse */
+}
+
+.header-container {
+    position: sticky;
+    top: 0;
+    z-index: 1; /* Assurez-vous que l'en-tête reste au-dessus des autres éléments */
 }

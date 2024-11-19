@@ -1,0 +1,17 @@
+<!-- Modal personnalisé pour les méthodes de communication -->
+<div id="<%= modalId %>" class="custom-modal">
+    <div class="custom-modal-content">
+        <span class="custom-close" onclick="closeModal('<%= modalId %>')">&times;</span>
+        <h2><%= modalTitle %></h2>
+        <form id="<%= formId %>">
+            <label>Type de Méthode :</label>
+            <input type="text" name="method_type" required>
+
+            <label>Détails :</label>
+            <input type="text" name="details" required>
+
+            <button type="button" onclick="<%= saveFunction %>">Enregistrer</button>
+            <button type="button" onclick="closeModal('<%= modalId %>')">Annuler</button>
+        </form>
+    </div>
+</div>

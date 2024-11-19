@@ -1,0 +1,35 @@
+<!-- Modal personnalisé -->
+<div id="<%= modalId %>" class="custom-modal">
+    <div class="custom-modal-content">
+        <span class="custom-close" onclick="closeModal('<%= modalId %>')">&times;</span>
+        <h2><%= modalTitle %></h2>
+        <form id="<%= formId %>">
+            <label>Type d'Adresse :</label>
+            <select name="type" disabled>
+                <option value="main" <%= type === 'main' ? 'selected' : '' %>>Principale</option>
+                <option value="secondary" <%= type === 'secondary' ? 'selected' : '' %>>Annexe</option>
+            </select>
+
+            <label>Adresse Ligne 1 :</label>
+            <input type="text" name="address_line1" required>
+
+            <label>Adresse Ligne 2 :</label>
+            <input type="text" name="address_line2">
+
+            <label>Ville :</label>
+            <input type="text" name="city">
+
+            <label>État :</label>
+            <input type="text" name="state">
+
+            <label>Code Postal :</label>
+            <input type="text" name="zip_code">
+
+            <label>Pays :</label>
+            <input type="text" name="country">
+
+            <button type="button" onclick="<%= saveFunction %>">Enregistrer</button>
+            <button type="button" onclick="closeModal('<%= modalId %>')">Annuler</button>
+        </form>
+    </div>
+</div>

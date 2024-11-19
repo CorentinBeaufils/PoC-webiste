@@ -1,4 +1,4 @@
-// 1. Importations et Variables Globales
+//1. global variables
 let infos = [];
 let addresses = [];
 let contacts = [];
@@ -8,10 +8,10 @@ let currentPage = 1;
 const limit = 400;
 let isLoading = false;
 let hasMoreCustomers = true;
-let currentFilter = ''; // Variable pour stocker le filtre actuel
+let currentFilter = ''; //filter variable by name
 
 
-// 2. Fonctions Utilitaires
+// 2.utils
 const showMessage = (message, isError = false) => {
     const messageElement = document.getElementById('message');
     messageElement.textContent = message;
@@ -26,7 +26,7 @@ function isBlockEmpty(block) {
     return Object.values(block).every(value => value === null);
 }
 
-// Fonction de déconnexion
+//logout function
 document.getElementById('logoutButton')?.addEventListener('click', () => {
     fetch('/logout', { method: 'POST' })
         .then(() => {
@@ -36,9 +36,8 @@ document.getElementById('logoutButton')?.addEventListener('click', () => {
             console.error('Erreur lors de la déconnexion:', error);
         });
 });
-
-// 3. Gestion des Clients
-// Fonction pour charger et afficher la liste des clients avec pagination
+// 3. Customer Management
+// Function to load and display the list of customers with pagination
 async function loadCustomers(filter = '', page = 1, append = false) {
     if (isLoading || !hasMoreCustomers) return;
     isLoading = true;
@@ -48,11 +47,11 @@ async function loadCustomers(filter = '', page = 1, append = false) {
         if (response.ok) {
             const customers = await response.json();
             if (customers.length < limit) {
-                hasMoreCustomers = false; // Arrêter le lazy loading si moins de clients que la limite sont retournés
+                hasMoreCustomers = false; // stop lazy loading if there are no more customers
             }
             displayCustomerList(customers, append);
             currentPage = page;
-            currentFilter = filter; // Mettre à jour le filtre actuel
+            currentFilter = filter; //update the current filter
         } else {
             showMessage('Erreur lors du chargement des clients.', true);
         }
@@ -71,49 +70,49 @@ async function loadCustomerDetails(customerId) {
             const customer = await response.json();
             console.log('Détails du client:', customer);
             displayCustomerDetails(customer);
-            document.getElementById('customerList').style.display = 'none'; // Masquer la section customerList
+            document.getElementById('customerList').style.display = 'none'; // Hide the customer list
         } else {
             showMessage('Erreur lors du chargement des détails du client.', true);
         }
     } catch (error) {
         console.error('Erreur lors du chargement des détails du client:', error);
-        showMessage('Erreur lors du chargement des détails du client:', true);
+        showMessage('Erreur lors du chargement des détails du client.', true);
     }
 }
 
-// Fonction pour afficher la liste des clients
+// Function to display the list of customers
 function displayCustomerList(customers, append) {
     const customerListContainer = document.getElementById('customerContainer');
     if (!append) {
-        customerListContainer.innerHTML = ''; // Réinitialiser la liste si append est false
+        customerListContainer.innerHTML = ''; // Clear the list of customers
     }
 
     customers.forEach(customer => {
         const listItem = document.createElement('div');
         listItem.classList.add('customer-item');
-        listItem.textContent = customer.name; // Afficher le nom du client
+        listItem.textContent = customer.name; // Display the customer name
 
-        // Ajouter un gestionnaire de clic pour afficher les détails
+        // Add a click event listener to load the customer details
         listItem.addEventListener('click', () => {
-            loadCustomerDetails(customer.id); // Charger les détails du client depuis le serveur
+            loadCustomerDetails(customer.id); // Load the details of the selected customer
         });
 
         customerListContainer.appendChild(listItem);
     });
 }
 
-// Fonction pour filtrer les clients par nom
+// Function to load the next page of customers when scrolling
 function filterCustomers() {
     const filterName = document.getElementById('filterName').value;
-    hasMoreCustomers = true; // Réinitialiser le lazy loading lors de l'application d'un filtre
+    hasMoreCustomers = true; // Reset the flag to allow loading more customers
     loadCustomers(filterName);
 }
 
 function displayCustomerDetails(customer) {
     console.log('customer : ', customer);
-    currentCustomer = customer; // Stocker l'objet customer dans la variable globale
+    currentCustomer = customer; // Store the current customer in a global variable
 
-    // Affichage des infos clients de base
+    // display the customer details
     const customerInfo = document.getElementById('detailsCustomerInfo');
     customerInfo.innerHTML = `
         <p><strong>Nom :</strong> <span id="customerName">${customer.name}</span></p>
@@ -121,72 +120,57 @@ function displayCustomerDetails(customer) {
         <button onclick="editCustomerInfo()">Modifier</button>
     `;
 
-    // Affichage des adresses
+    // display the addresses
     const addressesContainer = document.getElementById('detailsAddressesContainer');
     addressesContainer.innerHTML = '';
+
     if (customer.addresses && Array.isArray(customer.addresses)) {
         console.log('Addresses: ', customer.addresses);
         customer.addresses.forEach((address, index) => {
-            const addressDiv = document.createElement('div');
-            addressDiv.classList.add('address-block');
-            addressDiv.innerHTML = `
-                <p><strong>Type :</strong> ${address.type === 'main' ? 'Principale' : 'Annexe'}</p>
-                <p><strong>Adresse :</strong> ${address.address_line1}, ${address.address_line2}, ${address.city}, ${address.state}, ${address.zip_code}, ${address.country}</p>
-                <button onclick="editAddress(${index})">Modifier</button>
-                ${address.type !== 'main' ? `<button onclick="removeAddress(${index})">Supprimer</button>` : ''}
-            `;
-            addressesContainer.appendChild(addressDiv);
+            addressesContainer.appendChild(createAddressDiv(address, index));
         });
     } else {
         console.log('No addresses found or addresses is not an array.');
     }
 
-    // Affichage des contacts
+    // display the contacts
     const contactsContainer = document.getElementById('detailsContactsContainer');
     contactsContainer.innerHTML = '';
+
     if (customer.contacts && Array.isArray(customer.contacts)) {
         console.log('Contacts: ', customer.contacts);
         customer.contacts.forEach((contact, index) => {
-            const contactDiv = document.createElement('div');
-            contactDiv.classList.add('contact-block');
-            contactDiv.innerHTML = `
-                <p><strong>Nom :</strong> ${contact.name}</p>
-                <p><strong>Téléphone :</strong> ${contact.phone_number}</p>
-                <p><strong>Email :</strong> ${contact.email}</p>
-                <p><strong>Téléphone Direct :</strong> ${contact.direct_phone}</p>
-                <button onclick="editContact(${index})">Modifier</button>
-                <button onclick="removeContact(${index})">Supprimer</button>
-            `;
-            contactsContainer.appendChild(contactDiv);
+            contactsContainer.appendChild(createContactDiv(contact, index));
         });
     } else {
         console.log('No contacts found or contacts is not an array.');
     }
 
-    // Affichage des méthodes de communication
+    // display the communication methods
     const communicationMethodsContainer = document.getElementById('detailsCommunicationMethodsContainer');
     communicationMethodsContainer.innerHTML = '';
+
     if (customer.communicationMethods && Array.isArray(customer.communicationMethods)) {
         console.log('Communication Methods: ', customer.communicationMethods);
         customer.communicationMethods.forEach((method, index) => {
-            const methodDiv = document.createElement('div');
-            methodDiv.classList.add("communication-method-block");
-            methodDiv.innerHTML = `
-                <p><strong>Type :</strong> ${method.method_type}</p>
-                <p><strong>Détails :</strong> ${method.details}</p>
-                <button onclick="editCommunicationMethod(${index})">Modifier</button>
-                <button onclick="removeCommunicationMethod(${index})">Supprimer</button>
-            `;
-            communicationMethodsContainer.appendChild(methodDiv);
+            communicationMethodsContainer.appendChild(createCommunicationMethodDiv(method, index));
         });
     } else {
         console.log('No communication methods found or communication methods is not an array.');
     }
 
-    // Afficher les détails du client
+    // Show the customer details section
     document.getElementById('customerDetails').style.display = 'block';
 }
 
+/**
+ * Edits the customer information by replacing the inner HTML of the element
+ * with id 'detailsCustomerInfo' with input fields for the customer name and notes.
+ * It also adds buttons to save or cancel the changes.
+ *
+ * The function assumes that there is a global variable `currentCustomer` 
+ * which contains the current customer's name and notes.
+ */
 function editCustomerInfo() {
     const customerInfo = document.getElementById('detailsCustomerInfo');
     customerInfo.innerHTML = `
@@ -201,6 +185,18 @@ function editCustomerInfo() {
     `;
 }
 
+/**
+ * Updates the current customer's information with the values from the input fields
+ * and sends the updated data to the server.
+ *
+ * This function retrieves the new customer name and notes from the input fields,
+ * updates the currentCustomer object, and sends a PUT request to the server
+ * to save the updated information. If the update is successful, it displays
+ * the updated customer details and a success message. If there is an error,
+ * it logs the error and displays an error message.
+ *
+ * @function
+ */
 function saveCustomerInfo() {
     const newName = document.getElementById('editCustomerName').value;
     const newNotes = document.getElementById('editCustomerNotes').value;
@@ -208,7 +204,7 @@ function saveCustomerInfo() {
     currentCustomer.name = newName;
     currentCustomer.notes = newNotes;
 
-    // Envoyer les données mises à jour au serveur
+    //send the updated customer data to the server
     fetch(`/api/customers/${currentCustomer.id}`, {
         method: 'PUT',
         headers: {
@@ -234,7 +230,7 @@ function cancelEditCustomerInfo() {
     displayCustomerDetails(currentCustomer);
 }
 
-// 4. Gestion des Adresses
+// 4. address management
 function addNewAddressBlock() {
     const addressBlock = document.createElement('div');
     addressBlock.classList.add('address-block');
@@ -269,6 +265,16 @@ function addNewAddressBlock() {
     document.getElementById('detailsAddressesContainer').appendChild(addressBlock);
 }
 
+/**
+ * Saves a new address for the current customer.
+ *
+ * This function retrieves the address details from the input fields within the same parent element as the button,
+ * normalizes the values, and sends them to the server to be saved. If the server returns a new address ID,
+ * the address is added to the current customer's address list and the customer details are re-displayed.
+ * If an error occurs, an error message is shown.
+ *
+ * @param {HTMLButtonElement} button - The button element that triggered the save action.
+ */
 function saveNewAddress(button) {
     const addressBlock = button.parentElement;
 
@@ -282,7 +288,7 @@ function saveNewAddress(button) {
         country: normalizeFieldValue(addressBlock.querySelector('input[name="country"]').value)
     };
 
-    // Envoyer les données de la nouvelle adresse au serveur
+    // Send the new address data to the server
     fetch(`/api/customers/${currentCustomer.id}/addresses`, {
         method: 'POST',
         headers: {
@@ -293,11 +299,11 @@ function saveNewAddress(button) {
         .then(response => response.json())
         .then(data => {
             if (data.id) {
-                // Ajoutez la nouvelle adresse à l'objet customer avec l'ID retourné par le serveur
+                // Add the new address to the customer object with the ID returned by the server
                 newAddress.id = data.id;
                 currentCustomer.addresses.push(newAddress);
 
-                // Réaffichez les détails du client
+                // Re-display the customer details
                 displayCustomerDetails(currentCustomer);
                 showMessage('Nouvelle adresse ajoutée avec succès.');
             } else {
@@ -310,57 +316,155 @@ function saveNewAddress(button) {
         });
 }
 
-function editAddress(index) {
-    const customer = currentCustomer; // Utiliser la variable globale
-    const addressesContainer = document.getElementById('detailsAddressesContainer');
-    const addressDiv = addressesContainer.children[index];
-    const address = customer.addresses[index];
-
-    addressDiv.innerHTML = `
-        <label>Type d'Adresse :</label>
-        <select name="type" disabled>
-            <option value="main" ${address.type === 'main' ? 'selected' : ''}>Principale</option>
-            <option value="secondary" ${address.type === 'secondary' ? 'selected' : ''}>Annexe</option>
-        </select>
-
-        <label>Adresse Ligne 1 :</label>
-        <input type="text" name="address_line1" value="${address.address_line1}" required>
-
-        <label>Adresse Ligne 2 :</label>
-        <input type="text" name="address_line2" value="${address.address_line2}">
-
-        <label>Ville :</label>
-        <input type="text" name="city" value="${address.city}">
-
-        <label>État :</label>
-        <input type="text" name="state" value="${address.state}">
-
-        <label>Code Postal :</label>
-        <input type="text" name="zip_code" value="${address.zip_code}">
-
-        <label>Pays :</label>
-        <input type="text" name="country" value="${address.country}">
-
-        <button onclick="saveAddress(${index})">Enregistrer</button>
-        <button onclick="cancelEditAddress(${index})">Annuler</button>
-        ${address.type !== 'main' ? `<button onclick="removeAddress(${index})">Supprimer</button>` : ''}
-    `;
+/**
+ * Opens a modal by setting its display style to 'block'.
+ *
+ * @param {string} modalId - The ID of the modal element to be opened.
+ */
+function openModal(modalId) {
+    document.getElementById(modalId).style.display = 'block';
 }
 
-function saveAddress(index) {
+/**
+ * Closes the modal dialog by setting its display style to 'none'.
+ *
+ * @param {string} modalId - The ID of the modal element to be closed.
+ */
+function closeModal(modalId) {
+    document.getElementById(modalId).style.display = 'none';
+}
+
+/**
+ * Resets the add address form and sets the address type to "secondary".
+ * Then, displays the modal for adding a new address.
+ * 
+ * Resets the form in the add address modal.
+ * Ensures the address type is always set to "secondary".
+ * Displays the add address modal.
+ */
+function addNewAddress() {
+    // Reset the add address form
+    const form = document.getElementById('addAddressForm');
+    form.reset();
+    form.elements['type'].value = 'secondary';
+
+    // Display the add address modal
+    openModal('addAddressModal');
+}
+
+/**
+ * Saves a new address by sending the form data to the server.
+ * 
+ * This function collects the address details from the form with ID 'addAddressForm',
+ * sends the data to the server to create a new address for the current customer,
+ * and updates the customer object with the new address if the server returns a valid ID.
+ * 
+ * @function
+ * @name saveNewAddress
+ * 
+ * @example
+ * // Call this function when the user submits the form to add a new address
+ * saveNewAddress();
+ * 
+ * @throws Will display an error message if there is an issue adding the new address.
+ */
+function saveNewAddress() {
+    const form = document.getElementById('addAddressForm');
+
+    const newAddress = {
+        type: form.elements['type'].value,
+        address_line1: form.elements['address_line1'].value,
+        address_line2: form.elements['address_line2'].value,
+        city: form.elements['city'].value,
+        state: form.elements['state'].value,
+        zip_code: form.elements['zip_code'].value,
+        country: form.elements['country'].value
+    };
+
+    // Send the new address data to the server
+    fetch(`/api/customers/${currentCustomer.id}/addresses`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(newAddress)
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.id) {
+                // Add the new address to the customer object with the ID returned by the server
+                newAddress.id = data.id;
+                currentCustomer.addresses.push(newAddress);
+
+                // Re-display the customer details
+                displayCustomerDetails(currentCustomer);
+                showMessage('Nouvelle adresse ajoutée avec succès.');
+                closeModal('addAddressModal');
+            } else {
+                showMessage('Erreur lors de l\'ajout de la nouvelle adresse.', true);
+            }
+        })
+        .catch(error => {
+            console.error('Erreur lors de l\'ajout de la nouvelle adresse:', error);
+            showMessage('Erreur lors de l\'ajout de la nouvelle adresse.', true);
+        });
+}
+
+/**
+ * Edits the address of a customer at the specified index.
+ * 
+ * This function populates a form within a modal with the address data of the customer.
+ * It uses the global variable `currentCustomer` to access the customer's addresses.
+ * 
+ * @param {number} index - The index of the address to be edited.
+ * 
+ * The form fields are filled with the address data:
+ * - type
+ * - address_line1
+ * - address_line2
+ * - city
+ * - state
+ * - zip_code
+ * - country
+ * 
+ * The form is given a data attribute `data-index` to store the index of the address.
+ * Finally, the modal is displayed.
+ */
+function editAddress(index) {
+    const customer = currentCustomer; // Use the global variable
+    const address = customer.addresses[index];
+
+    // Fill the modal form with the address data
+    const form = document.getElementById('editAddressForm');
+    form.elements['type'].value = address.type;
+    form.elements['address_line1'].value = address.address_line1;
+    form.elements['address_line2'].value = address.address_line2;
+    form.elements['city'].value = address.city;
+    form.elements['state'].value = address.state;
+    form.elements['zip_code'].value = address.zip_code;
+    form.elements['country'].value = address.country;
+
+    // Add a data-index attribute to store the address index
+    form.setAttribute('data-index', index);
+
+    // Display the modal
+    openModal('editAddressModal');
+}
+
+function saveAddress() {
+    const form = document.getElementById('editAddressForm');
+    const index = form.getAttribute('data-index');
     const customer = currentCustomer; // Utiliser la variable globale
-    const addressesContainer = document.getElementById('detailsAddressesContainer');
-    const addressDiv = addressesContainer.children[index];
     const addressId = customer.addresses[index].id; // Assurez-vous que chaque adresse a un identifiant unique
 
     const updatedAddress = {
-        type: customer.addresses[index].type, // Ne pas permettre la modification du type
-        address_line1: normalizeFieldValue(addressDiv.querySelector('input[name="address_line1"]').value),
-        address_line2: normalizeFieldValue(addressDiv.querySelector('input[name="address_line2"]').value),
-        city: normalizeFieldValue(addressDiv.querySelector('input[name="city"]').value),
-        state: normalizeFieldValue(addressDiv.querySelector('input[name="state"]').value),
-        zip_code: normalizeFieldValue(addressDiv.querySelector('input[name="zip_code"]').value),
-        country: normalizeFieldValue(addressDiv.querySelector('input[name="country"]').value)
+        type: form.elements['type'].value, // Ne pas permettre la modification du type
+        address_line1: form.elements['address_line1'].value,
+        address_line2: form.elements['address_line2'].value,
+        city: form.elements['city'].value,
+        state: form.elements['state'].value,
+        zip_code: form.elements['zip_code'].value,
+        country: form.elements['country'].value
     };
 
     // Mettez à jour l'adresse dans l'objet customer
@@ -378,6 +482,7 @@ function saveAddress(index) {
             if (response.ok) {
                 displayCustomerDetails(customer);
                 showMessage('Adresse mise à jour avec succès.');
+                closeModal('editAddressModal');
             } else {
                 showMessage('Erreur lors de la mise à jour de l\'adresse.', true);
             }
@@ -422,6 +527,67 @@ function removeAddress(index) {
             console.error('Erreur lors de la suppression de l\'adresse:', error);
             showMessage('Erreur lors de la suppression de l\'adresse.', true);
         });
+}
+
+function createAddressTypeSection(address) {
+    const addressTypeDiv = document.createElement('div');
+    addressTypeDiv.classList.add('address-type');
+    addressTypeDiv.innerHTML = `<p>${address.type === 'main' ? 'Main' : 'Secondary'}</p>`;
+    return addressTypeDiv;
+}
+
+function createAddressElementsSection(address) {
+    const addressElementsDiv = document.createElement('div');
+    addressElementsDiv.classList.add('address-elements');
+
+    let addressContent = '';
+
+    if (address.address_line1 && address.address_line1 !== 'null') {
+        addressContent += `<span>${address.address_line1}</span>`;
+    }
+    if (address.address_line2 && address.address_line2 !== 'null') {
+        addressContent += `, <span>${address.address_line2}</span>`;
+    }
+    if (address.city && address.city !== 'null') {
+        addressContent += `, <span>${address.city}</span>`;
+    }
+    if (address.state && address.state !== 'null') {
+        addressContent += `, <span>${address.state}</span>`;
+    }
+    if (address.zip_code && address.zip_code !== 'null') {
+        addressContent += `, <span>${address.zip_code}</span>`;
+    }
+    if (address.country && address.country !== 'null') {
+        addressContent += `, <span>${address.country}</span>`;
+    }
+
+    addressElementsDiv.innerHTML = addressContent;
+    return addressElementsDiv;
+}
+
+function createAddressButtonsSection(address, index) {
+    const addressButtonsDiv = document.createElement('div');
+    addressButtonsDiv.classList.add('address-buttons');
+    addressButtonsDiv.innerHTML = `
+        ${address.type !== 'main' ? `<button onclick="event.stopPropagation(); removeAddress(${index})">Supprimer</button>` : ''}
+    `;
+    return addressButtonsDiv;
+}
+
+function createAddressDiv(address, index) {
+    const addressDiv = document.createElement('div');
+    addressDiv.classList.add('customer-detail-address');
+
+    addressDiv.appendChild(createAddressTypeSection(address));
+    addressDiv.appendChild(createAddressElementsSection(address));
+    addressDiv.appendChild(createAddressButtonsSection(address, index));
+
+    // Ajouter un gestionnaire d'événements click pour éditer l'adresse
+    addressDiv.addEventListener('click', () => {
+        editAddress(index);
+    });
+
+    return addressDiv;
 }
 
 // 5. Gestion des Contacts
@@ -492,42 +658,90 @@ function saveNewContact(button) {
         });
 }
 
-function editContact(index) {
-    const customer = currentCustomer; // Utiliser la variable globale
-    const contactsContainer = document.getElementById('detailsContactsContainer');
-    const contactDiv = contactsContainer.children[index];
-    const contact = customer.contacts[index];
+function addNewContact() {
+    // Réinitialiser le formulaire du modal d'ajout de contact
+    const form = document.getElementById('addContactForm');
+    form.reset();
 
-    contactDiv.innerHTML = `
-        <label>Nom du Contact :</label>
-        <input type="text" name="name" value="${contact.name}" required>
-
-        <label>Numéro de Téléphone :</label>
-        <input type="tel" name="phone_number" value="${contact.phone_number}">
-
-        <label>Email :</label>
-        <input type="email" name="email" value="${contact.email}">
-
-        <label>Téléphone Direct :</label>
-        <input type="tel" name="direct_phone" value="${contact.direct_phone}">
-
-        <button onclick="saveContact(${index})">Enregistrer</button>
-        <button onclick="cancelEditContact(${index})">Annuler</button>
-        <button onclick="removeContact(${index})">Supprimer</button>
-    `;
+    // Afficher le modal
+    openModal('addContactModal');
 }
 
-function saveContact(index) {
+function saveNewContact() {
+    const form = document.getElementById('addContactForm');
+
+    const newContact = {
+        name: form.elements['name'].value,
+        phone_number: form.elements['phone_number'].value,
+        email: form.elements['email'].value,
+        direct_phone: form.elements['direct_phone'].value
+    };
+
+    // Si direct_phone est null, il prendra la valeur de phone_number et inversement
+    if (!newContact.direct_phone) {
+        newContact.direct_phone = newContact.phone_number;
+    } else if (!newContact.phone_number) {
+        newContact.phone_number = newContact.direct_phone;
+    }
+
+    // Envoyer les données du nouveau contact au serveur
+    fetch(`/api/customers/${currentCustomer.id}/contacts`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(newContact)
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.id) {
+                // Ajoutez le nouveau contact à l'objet customer avec l'ID retourné par le serveur
+                newContact.id = data.id;
+                currentCustomer.contacts.push(newContact);
+
+                // Réaffichez les détails du client
+                displayCustomerDetails(currentCustomer);
+                showMessage('Nouveau contact ajouté avec succès.');
+                closeModal('addContactModal');
+            } else {
+                showMessage('Erreur lors de l\'ajout du nouveau contact.', true);
+            }
+        })
+        .catch(error => {
+            console.error('Erreur lors de l\'ajout du nouveau contact:', error);
+            showMessage('Erreur lors de l\'ajout du nouveau contact.', true);
+        });
+}
+
+function editContact(index) {
     const customer = currentCustomer; // Utiliser la variable globale
-    const contactsContainer = document.getElementById('detailsContactsContainer');
-    const contactDiv = contactsContainer.children[index];
+    const contact = customer.contacts[index];
+
+    // Remplir le formulaire du modal avec les données du contact
+    const form = document.getElementById('editContactForm');
+    form.elements['name'].value = contact.name;
+    form.elements['phone_number'].value = contact.phone_number;
+    form.elements['email'].value = contact.email;
+    form.elements['direct_phone'].value = contact.direct_phone;
+
+    // Ajouter un attribut data-index pour stocker l'index du contact
+    form.setAttribute('data-index', index);
+
+    // Afficher le modal
+    openModal('editContactModal');
+}
+
+function saveContact() {
+    const form = document.getElementById('editContactForm');
+    const index = form.getAttribute('data-index');
+    const customer = currentCustomer; // Utiliser la variable globale
     const contactId = customer.contacts[index].id; // Assurez-vous que chaque contact a un identifiant unique
 
     const updatedContact = {
-        name: normalizeFieldValue(contactDiv.querySelector('input[name="name"]').value),
-        phone_number: normalizeFieldValue(contactDiv.querySelector('input[name="phone_number"]').value),
-        email: normalizeFieldValue(contactDiv.querySelector('input[name="email"]').value),
-        direct_phone: normalizeFieldValue(contactDiv.querySelector('input[name="direct_phone"]').value)
+        name: form.elements['name'].value,
+        phone_number: form.elements['phone_number'].value,
+        email: form.elements['email'].value,
+        direct_phone: form.elements['direct_phone'].value
     };
 
     // Si direct_phone est null, il prendra la valeur de phone_number et inversement
@@ -552,6 +766,7 @@ function saveContact(index) {
             if (response.ok) {
                 displayCustomerDetails(customer);
                 showMessage('Contact mis à jour avec succès.');
+                closeModal('editContactModal');
             } else {
                 showMessage('Erreur lors de la mise à jour du contact.', true);
             }
@@ -598,7 +813,77 @@ function removeContactBlock(button) {
     contactBlock.remove();
 }
 
+function createContactDiv(contact, index) {
+    const contactDiv = document.createElement('div');
+    contactDiv.classList.add('customer-detail-contact');
+
+    contactDiv.appendChild(createContactNameSection(contact));
+    contactDiv.appendChild(createContactDetailsSection(contact));
+    contactDiv.appendChild(createContactButtonsSection(contact, index));
+
+    // Ajouter un gestionnaire d'événements click pour éditer le contact
+    contactDiv.addEventListener('click', () => {
+        editContact(index);
+    });
+
+    return contactDiv;
+}
+
+function createContactNameSection(contact) {
+    const contactNameDiv = document.createElement('div');
+    contactNameDiv.classList.add('contact-name');
+    contactNameDiv.innerHTML = `<p>${contact.name}</p>`;
+    return contactNameDiv;
+}
+
+function createContactDetailsSection(contact) {
+    const contactDetailsDiv = document.createElement('div');
+    contactDetailsDiv.classList.add('contact-details');
+    contactDetailsDiv.innerHTML = `
+        <p><strong>Téléphone :</strong> ${contact.phone_number}</p>
+        <p><strong>Email :</strong> ${contact.email}</p>
+        <p><strong>Téléphone Direct :</strong> ${contact.direct_phone}</p>
+    `;
+    return contactDetailsDiv;
+}
+
+function createContactButtonsSection(contact, index) {
+    const contactButtonsDiv = document.createElement('div');
+    contactButtonsDiv.classList.add('contact-buttons');
+    contactButtonsDiv.innerHTML = `
+        <button onclick="event.stopPropagation(); removeContact(${index})">Supprimer</button>
+    `;
+    return contactButtonsDiv;
+}
+
+function createContactHeader() {
+    const headerDiv = document.createElement('div');
+    headerDiv.classList.add('customer-detail-contact', 'header');
+
+    const nameHeader = document.createElement('div');
+    nameHeader.classList.add('contact-name');
+    nameHeader.innerHTML = '<strong>Nom</strong>';
+    headerDiv.appendChild(nameHeader);
+
+    const detailsHeader = document.createElement('div');
+    detailsHeader.classList.add('contact-details');
+    detailsHeader.innerHTML = '<strong>Détails</strong>';
+    headerDiv.appendChild(detailsHeader);
+
+    const actionHeader = document.createElement('div');
+    actionHeader.classList.add('contact-buttons');
+    actionHeader.innerHTML = '<strong>Action</strong>';
+    headerDiv.appendChild(actionHeader);
+
+    return headerDiv;
+}
+
 // 6. Gestion des Méthodes de Communication
+/**
+ * Adds a new communication method block to the container.
+ * This function creates a new block with input fields for method type and details,
+ * and appends it to the communication methods container.
+ */
 function addCommunicationMethodBlock() {
     const methodBlock = document.createElement('div');
     methodBlock.classList.add('communication-method-block');
@@ -615,39 +900,58 @@ function addCommunicationMethodBlock() {
     document.getElementById('detailsCommunicationMethodsContainer').appendChild(methodBlock);
 }
 
+/**
+ * Removes a communication method block from the container.
+ *
+ * @param {HTMLButtonElement} button - The button element that triggered the remove action.
+ */
 function removeCommunicationMethodBlock(button) {
     const communicationtBlock = button.parentElement;
     communicationtBlock.remove();
 }
 
-
+/**
+ * Removes a communication method from the customer's communication methods.
+ * Sends a DELETE request to the server to remove the communication method.
+ *
+ * @param {number} index - The index of the communication method to be removed.
+ */
 function removeCommunicationMethod(index) {
-    const customer = currentCustomer; // Utiliser la variable globale
-    const methodId = customer.communicationMethods[index].id; // Assurez-vous que chaque méthode de communication a un identifiant unique
+    const customer = currentCustomer; // Use the global variable
+    const methodId = customer.communicationMethods[index].id; // Ensure each communication method has a unique ID
 
-    // Envoyer la requête de suppression au serveur
+    // Send the delete request to the server
     fetch(`/api/customers/${customer.id}/communicationMethods/${methodId}`, {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json'
         }
     })
-    .then(response => {
-        if (response.ok) {
-            // Supprimez la méthode de communication de l'objet customer
-            customer.communicationMethods.splice(index, 1);
-            displayCustomerDetails(customer);
-            showMessage('Méthode de communication supprimée avec succès.');
-        } else {
+        .then(response => {
+            if (response.ok) {
+                // Remove the communication method from the customer object
+                customer.communicationMethods.splice(index, 1);
+                displayCustomerDetails(customer);
+                showMessage('Méthode de communication supprimée avec succès.');
+            } else {
+                showMessage('Erreur lors de la suppression de la méthode de communication.', true);
+            }
+        })
+        .catch(error => {
+            console.error('Erreur lors de la suppression de la méthode de communication:', error);
             showMessage('Erreur lors de la suppression de la méthode de communication.', true);
-        }
-    })
-    .catch(error => {
-        console.error('Erreur lors de la suppression de la méthode de communication:', error);
-        showMessage('Erreur lors de la suppression de la méthode de communication.', true);
-    });
+        });
 }
 
+/**
+ * Saves a new communication method for the current customer.
+ * This function retrieves the method details from the input fields within the same parent element as the button,
+ * normalizes the values, and sends them to the server to be saved. If the server returns a new method ID,
+ * the method is added to the current customer's communication methods list and the customer details are re-displayed.
+ * If an error occurs, an error message is shown.
+ *
+ * @param {HTMLButtonElement} button - The button element that triggered the save action.
+ */
 function saveCommunicationMethod(button) {
     const methodBlock = button.parentElement;
 
@@ -661,7 +965,7 @@ function saveCommunicationMethod(button) {
         return;
     }
 
-    // Envoyer les données de la nouvelle méthode de communication au serveur
+    // Send the new communication method data to the server
     fetch(`/api/customers/${currentCustomer.id}/communicationMethods`, {
         method: 'POST',
         headers: {
@@ -669,64 +973,70 @@ function saveCommunicationMethod(button) {
         },
         body: JSON.stringify(newMethod)
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.id) {
-            // Ajoutez la nouvelle méthode de communication à l'objet customer avec l'ID retourné par le serveur
-            newMethod.id = data.id;
-            currentCustomer.communicationMethods.push(newMethod);
+        .then(response => response.json())
+        .then(data => {
+            if (data.id) {
+                // Add the new communication method to the customer object with the ID returned by the server
+                newMethod.id = data.id;
+                currentCustomer.communicationMethods.push(newMethod);
 
-            // Réaffichez les détails du client
-            displayCustomerDetails(currentCustomer);
-            showMessage('Nouvelle méthode de communication ajoutée avec succès.');
-        } else {
+                // Re-display the customer details
+                displayCustomerDetails(currentCustomer);
+                showMessage('Nouvelle méthode de communication ajoutée avec succès.');
+            } else {
+                showMessage('Erreur lors de l\'ajout de la nouvelle méthode de communication.', true);
+            }
+        })
+        .catch(error => {
+            console.error('Erreur lors de l\'ajout de la nouvelle méthode de communication:', error);
             showMessage('Erreur lors de l\'ajout de la nouvelle méthode de communication.', true);
-        }
-    })
-    .catch(error => {
-        console.error('Erreur lors de l\'ajout de la nouvelle méthode de communication:', error);
-        showMessage('Erreur lors de l\'ajout de la nouvelle méthode de communication.', true);
-    });
+        });
 }
 
+/**
+ * Opens the modal to edit a communication method.
+ * This function fills the modal form with the communication method data and displays the modal.
+ *
+ * @param {number} index - The index of the communication method to be edited.
+ */
 function editCommunicationMethod(index) {
-    const customer = currentCustomer; // Utiliser la variable globale
-    const communicationMethodsContainer = document.getElementById('detailsCommunicationMethodsContainer');
-    const methodDiv = communicationMethodsContainer.children[index];
+    const customer = currentCustomer; // Use the global variable
     const method = customer.communicationMethods[index];
 
-    methodDiv.innerHTML = `
-        <label>Type de Méthode :</label>
-        <input type="text" name="method_type" value="${method.method_type}" required>
+    // Fill the modal form with the communication method data
+    const form = document.getElementById('editCommunicationMethodForm');
+    form.elements['method_type'].value = method.method_type;
+    form.elements['details'].value = method.details;
 
-        <label>Détails :</label>
-        <input type="text" name="details" value="${method.details}" required>
+    // Add a data-index attribute to store the index of the communication method
+    form.setAttribute('data-index', index);
 
-        <button onclick="updateCommunicationMethod(${index})">Enregistrer</button>
-        <button onclick="cancelEditCommunicationMethod(${index})">Annuler</button>
-    `;
+    // Display the modal
+    openModal('editCommunicationMethodModal');
 }
 
-function updateCommunicationMethod(index) {
-    const customer = currentCustomer; // Utiliser la variable globale
-    const communicationMethodsContainer = document.getElementById('detailsCommunicationMethodsContainer');
-    const methodDiv = communicationMethodsContainer.children[index];
-    const methodId = customer.communicationMethods[index].id; // Assurez-vous que chaque méthode de communication a un identifiant unique
+/**
+ * Saves the edited communication method for the current customer.
+ * This function retrieves the updated method details from the modal form,
+ * normalizes the values, and sends them to the server to be updated. If the server confirms the update,
+ * the method is updated in the current customer's communication methods list and the customer details are re-displayed.
+ * If an error occurs, an error message is shown.
+ */
+function saveCommunicationMethod() {
+    const form = document.getElementById('editCommunicationMethodForm');
+    const index = form.getAttribute('data-index');
+    const customer = currentCustomer; // Use the global variable
+    const methodId = customer.communicationMethods[index].id; // Ensure each communication method has a unique ID
 
     const updatedMethod = {
-        method_type: normalizeFieldValue(methodDiv.querySelector('input[name="method_type"]').value),
-        details: normalizeFieldValue(methodDiv.querySelector('input[name="details"]').value)
+        method_type: form.elements['method_type'].value,
+        details: form.elements['details'].value
     };
 
-    if (!updatedMethod.method_type) {
-        showMessage('Le type de méthode ne peut pas être vide.', true);
-        return;
-    }
-
-    // Mettez à jour la méthode de communication dans l'objet customer
+    // Update the communication method in the customer object
     customer.communicationMethods[index] = updatedMethod;
 
-    // Envoyer les données mises à jour au serveur
+    // Send the updated data to the server
     fetch(`/api/customers/${customer.id}/communicationMethods/${methodId}`, {
         method: 'PUT',
         headers: {
@@ -734,51 +1044,189 @@ function updateCommunicationMethod(index) {
         },
         body: JSON.stringify(updatedMethod)
     })
-    .then(response => {
-        if (response.ok) {
-            displayCustomerDetails(customer);
-            showMessage('Méthode de communication mise à jour avec succès.');
-        } else {
+        .then(response => {
+            if (response.ok) {
+                displayCustomerDetails(customer);
+                showMessage('Méthode de communication mise à jour avec succès.');
+                closeModal('editCommunicationMethodModal');
+            } else {
+                showMessage('Erreur lors de la mise à jour de la méthode de communication.', true);
+            }
+        })
+        .catch(error => {
+            console.error('Erreur lors de la mise à jour de la méthode de communication:', error);
             showMessage('Erreur lors de la mise à jour de la méthode de communication.', true);
-        }
-    })
-    .catch(error => {
-        console.error('Erreur lors de la mise à jour de la méthode de communication:', error);
-        showMessage('Erreur lors de la mise à jour de la méthode de communication.', true);
-    });
+        });
 }
 
-function cancelEditCommunicationMethod(index) {
+/**
+ * Cancels the edit of a communication method and re-displays the customer details.
+ */
+function cancelEditCommunicationMethod() {
     displayCustomerDetails(currentCustomer);
 }
 
+/**
+ * Creates a communication method div element with type, details, and buttons sections.
+ * Adds a click event listener to edit the communication method when the div is clicked.
+ *
+ * @param {object} method - The communication method object.
+ * @param {number} index - The index of the communication method.
+ * @returns {HTMLDivElement} The created communication method div element.
+ */
+function createCommunicationMethodDiv(method, index) {
+    const methodDiv = document.createElement('div');
+    methodDiv.classList.add('customer-communication-method');
+
+    methodDiv.appendChild(createCommunicationMethodTypeSection(method));
+    methodDiv.appendChild(createCommunicationMethodDetailsSection(method));
+    methodDiv.appendChild(createCommunicationMethodButtonsSection(method, index));
+
+    // Add a click event listener to edit the communication method
+    methodDiv.addEventListener('click', () => {
+        editCommunicationMethod(index);
+    });
+
+    return methodDiv;
+}
+
+/**
+ * Creates a div element for the communication method type section.
+ *
+ * @param {object} method - The communication method object.
+ * @returns {HTMLDivElement} The created communication method type div element.
+ */
+function createCommunicationMethodTypeSection(method) {
+    const methodTypeDiv = document.createElement('div');
+    methodTypeDiv.classList.add('customer-communication-method-type');
+    methodTypeDiv.innerHTML = `<p><strong>Type :</strong> ${method.method_type}</p>`;
+    return methodTypeDiv;
+}
+
+/**
+ * Creates a div element for the communication method details section.
+ *
+ * @param {object} method - The communication method object.
+ * @returns {HTMLDivElement} The created communication method details div element.
+ */
+function createCommunicationMethodDetailsSection(method) {
+    const methodDetailsDiv = document.createElement('div');
+    methodDetailsDiv.classList.add('customer-communication-method-details');
+    methodDetailsDiv.innerHTML = `<p><strong>Détails :</strong> ${method.details}</p>`;
+    return methodDetailsDiv;
+}
+
+/**
+ * Creates a div element for the communication method buttons section.
+ * Adds buttons for editing and removing the communication method.
+ *
+ * @param {object} method - The communication method object.
+ * @param {number} index - The index of the communication method.
+ * @returns {HTMLDivElement} The created communication method buttons div element.
+ */
+function createCommunicationMethodButtonsSection(method, index) {
+    const methodButtonsDiv = document.createElement('div');
+    methodButtonsDiv.classList.add('customer-communication-method-buttons');
+    methodButtonsDiv.innerHTML = `
+        <button onclick="event.stopPropagation(); removeCommunicationMethod(${index})">Supprimer</button>
+    `;
+    return methodButtonsDiv;
+}
+
+/**
+ * Opens the modal to add a new communication method.
+ * Resets the form fields and displays the modal.
+ */
+function addNewCommunicationMethod() {
+    // Reset the form fields
+    const form = document.getElementById('addCommunicationMethodForm');
+    form.reset();
+
+    // Display the modal
+    openModal('addCommunicationMethodModal');
+}
+
+/**
+ * Saves a new communication method for the current customer.
+ * This function retrieves the method details from the modal form,
+ * normalizes the values, and sends them to the server to be saved. If the server returns a new method ID,
+ * the method is added to the current customer's communication methods list and the customer details are re-displayed.
+ * If an error occurs, an error message is shown.
+ */
+function saveNewCommunicationMethod() {
+    const form = document.getElementById('addCommunicationMethodForm');
+
+    const newMethod = {
+        method_type: form.elements['method_type'].value,
+        details: form.elements['details'].value
+    };
+
+    // Send the new communication method data to the server
+    fetch(`/api/customers/${currentCustomer.id}/communicationMethods`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(newMethod)
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.id) {
+                // Add the new communication method to the customer object with the ID returned by the server
+                newMethod.id = data.id;
+                currentCustomer.communicationMethods.push(newMethod);
+
+                // Re-display the customer details
+                displayCustomerDetails(currentCustomer);
+                showMessage('Nouvelle méthode de communication ajoutée avec succès.');
+                closeModal('addCommunicationMethodModal');
+            } else {
+                showMessage('Erreur lors de l\'ajout de la nouvelle méthode de communication.', true);
+            }
+        })
+        .catch(error => {
+            console.error('Erreur lors de l\'ajout de la nouvelle méthode de communication:', error);
+            showMessage('Erreur lors de l\'ajout de la nouvelle méthode de communication.', true);
+        });
+}
 
 // 7. Gestion des Sections
+/**
+ * Shows the specified section and hides others.
+ * If the 'viewCustomers' section is selected, it loads the customer list.
+ *
+ * @param {string} sectionId - The ID of the section to be displayed.
+ */
 function showSection(sectionId) {
     const sections = document.querySelectorAll('.customer-section, .sub-section');
     sections.forEach(section => {
         section.style.display = section.id === sectionId ? 'block' : 'none';
     });
 
-    // Charger la liste des clients si la section 'viewCustomers' est sélectionnée
+    // Load the customer list if the 'viewCustomers' section is selected
     if (sectionId === 'viewCustomers') {
         loadCustomers();
-        document.getElementById('customerList').style.display = 'block'; // Réafficher la section customerList
-        document.getElementById('customerDetails').style.display = 'none'; // Masquer la section customerDetails
+        document.getElementById('customerList').style.display = 'block'; // Re-display the customerList section
+        document.getElementById('customerDetails').style.display = 'none'; // Hide the customerDetails section
     }
 }
 
 // 8. Gestion des Formulaires
+/**
+ * Handles the form submission for creating or updating a customer.
+ * Collects customer information, addresses, contacts, and communication methods,
+ * and sends the data to the server.
+ */
 document.getElementById('customerForm').addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    // Collecter les informations de base du client
+    // Collect basic customer information
     const infos = {
         name: normalizeFieldValue(document.getElementById('customerName').value),
         notes: normalizeFieldValue(document.getElementById('customerNotes').value)
     };
 
-    // Collecter les adresses
+    // Collect addresses
     const addressElements = document.querySelectorAll('#addressesContainer .address-block');
     const addresses = Array.from(addressElements).map(addressElement => {
         return {
@@ -792,7 +1240,7 @@ document.getElementById('customerForm').addEventListener('submit', async (e) => 
         };
     });
 
-    // Collecter les contacts
+    // Collect contacts
     const contactElements = document.querySelectorAll('#contactsContainer .contact-block');
     const contacts = Array.from(contactElements).map(contactElement => {
         return {
@@ -803,7 +1251,7 @@ document.getElementById('customerForm').addEventListener('submit', async (e) => 
         };
     });
 
-    // Collecter les méthodes de communication
+    // Collect communication methods
     const methodElements = document.querySelectorAll('#communicationMethodForm .communication-method-block');
     const communicationMethods = Array.from(methodElements).map(methodElement => {
         return {
@@ -812,7 +1260,7 @@ document.getElementById('customerForm').addEventListener('submit', async (e) => 
         };
     });
 
-    // Envoyer les données au serveur
+    // Send the data to the server
     try {
         const response = await fetch('/api/customers', {
             method: 'POST',
@@ -835,6 +1283,9 @@ document.getElementById('customerForm').addEventListener('submit', async (e) => 
 });
 
 // 9. Initialisation
+/**
+ * Initializes the page by loading the customers and setting up the scroll event listener for lazy loading.
+ */
 document.addEventListener('DOMContentLoaded', () => {
     loadCustomers();
 

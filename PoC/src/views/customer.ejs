@@ -7,7 +7,9 @@
     <title>Gestion des Clients</title>
     <link rel="stylesheet" href="/css/customer.css">
     <link rel="stylesheet" href="/css/navbar.css">
+    <link rel="stylesheet" href="/css/modale.css">
     <script src="/js/customer.js" defer></script>
+
 </head>
 
 <body>
@@ -23,6 +25,58 @@
             <button onclick="showSection('communications')">Communications / Notes</button>
             <button onclick="showSection('orders')">Commandes</button>
         </div>
+
+    <!-- Inclure le partial pour le modal d'édition d'adresse -->
+    <%- include('partials/modal', { 
+        modalId: 'editAddressModal', 
+        modalTitle: 'Modifier l\'Adresse', 
+        formId: 'editAddressForm', 
+        saveFunction: 'saveAddress()', 
+        disableType: true,
+        type: 'main'
+    }) %>
+
+    <!-- Inclure le partial pour le modal d'ajout d'adresse -->
+    <%- include('partials/modal', { 
+        modalId: 'addAddressModal', 
+        modalTitle: 'Ajouter une Nouvelle Adresse', 
+        formId: 'addAddressForm', 
+        saveFunction: 'saveNewAddress()', 
+        disableType: true,
+        type: 'secondary'
+    }) %>
+
+    <!-- Inclure le partial pour le modal d'édition de contact -->
+    <%- include('partials/modal_contact', { 
+        modalId: 'editContactModal', 
+        modalTitle: 'Modifier le Contact', 
+        formId: 'editContactForm', 
+        saveFunction: 'saveContact()'
+    }) %>
+
+    <!-- Inclure le partial pour le modal d'ajout de contact -->
+    <%- include('partials/modal_contact', { 
+        modalId: 'addContactModal', 
+        modalTitle: 'Ajouter un Nouveau Contact', 
+        formId: 'addContactForm', 
+        saveFunction: 'saveNewContact()'
+    }) %>
+
+    <!-- Inclure le partial pour le modal d'édition de méthode de communication -->
+    <%- include('partials/modal_communication_method', { 
+        modalId: 'editCommunicationMethodModal', 
+        modalTitle: 'Modifier la Méthode de Communication', 
+        formId: 'editCommunicationMethodForm', 
+        saveFunction: 'saveCommunicationMethod()'
+    }) %>
+
+    <!-- Inclure le partial pour le modal d'ajout de méthode de communication -->
+    <%- include('partials/modal_communication_method', { 
+        modalId: 'addCommunicationMethodModal', 
+        modalTitle: 'Ajouter une Nouvelle Méthode de Communication', 
+        formId: 'addCommunicationMethodForm', 
+        saveFunction: 'saveNewCommunicationMethod()'
+    }) %>
 
         <!-- Section pour créer un client -->
         <section id="createCustomer" class="main-section customer-section">
@@ -126,16 +180,37 @@
                 <div id="detailsCustomerInfo" class="info-block"></div>
 
                 <h3>Adresses</h3>
-                <div id="detailsAddressesContainer"></div>
-                <button onclick="addNewAddressBlock()">Ajouter une adresse</button>
+                <div class="header-container">
+                    <div class="customer-detail-address header">
+                        <div class="address-type"><strong>Type</strong></div>
+                        <div class="address-elements"><strong>Adresse</strong></div>
+                        <div class="address-buttons"><strong>Action</strong></div>
+                    </div>
+                </div>
+                <div id="detailsAddressesContainer" class="customer-grid"></div>
+                <button onclick="addNewAddress()">Ajouter une adresse</button>
 
                 <h3>Contacts</h3>
-                <div id="detailsContactsContainer"></div>
-                <button onclick="addNewContactBlock()">Ajouter un contact</button>
+                <div class="header-container">
+                    <div class="customer-detail-contact header">
+                        <div class="contact-name"><strong>Nom</strong></div>
+                        <div class="contact-details"><strong>Détails</strong></div>
+                        <div class="contact-buttons"><strong>Action</strong></div>
+                    </div>
+                </div>
+                <div id="detailsContactsContainer" class="customer-grid"></div>
+                <button onclick="addNewContact()">Ajouter un contact</button>
 
                 <h3>Méthodes de Communication</h3>
-                <div id="detailsCommunicationMethodsContainer"></div>
-                <button onclick="addCommunicationMethodBlock()">Ajouter une méthode de communication</button>
+                <div class="header-container">
+                    <div class="customer-communication-method header">
+                        <div class="communication-method-type"><strong>Type</strong></div>
+                        <div class="communication-method-details"><strong>Détails</strong></div>
+                        <div class="communication-method-buttons"><strong>Action</strong></div>
+                    </div>
+                </div>
+                <div id="detailsCommunicationMethodsContainer" class="customer-grid"></div>
+                <button onclick="addNewCommunicationMethod()">Ajouter une méthode de communication</button>
 
                 <!-- Conteneur pour le bouton de retour -->
                 <div class="return-button-container">
@@ -163,6 +238,7 @@
 
         <!-- Message d'erreur ou de succès -->
         <p id="message"></p>
-</body>
+
+  </body>
 
 </html>

@@ -1,0 +1,74 @@
+/* Styles pour le modal personnalisé */
+.custom-modal {
+    display: none; /* Cacher le modal par défaut */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5); /* Fond semi-transparent */
+}
+
+.custom-modal-content {
+    background-color: #fff;
+    margin: 5% auto; /* Ajustez la marge pour centrer le modal verticalement */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 600px;
+    max-height: 90vh; /* Limite la hauteur du modal à 90% de la hauteur de la fenêtre */
+    overflow-y: auto; /* Ajoute une barre de défilement verticale si le contenu dépasse la hauteur maximale */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+}
+
+.custom-close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.custom-close:hover,
+.custom-close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.custom-modal form {
+    display: flex;
+    flex-direction: column;
+}
+
+.custom-modal form label {
+    margin-top: 10px;
+}
+
+.custom-modal form input,
+.custom-modal form select {
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.custom-modal form button {
+    margin-top: 20px;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.custom-modal form button:first-of-type {
+    background-color: #007bff;
+    color: white;
+}
+
+.custom-modal form button:last-of-type {
+    background-color: #6c757d;
+    color: white;
+}
