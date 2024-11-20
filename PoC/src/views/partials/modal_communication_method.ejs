@@ -5,10 +5,10 @@
         <h2><%= modalTitle %></h2>
         <form id="<%= formId %>">
             <label>Type de Méthode :</label>
-            <input type="text" name="method_type" required>
+            <input type="text" name="contact_type" required>
 
             <label>Détails :</label>
-            <input type="text" name="details" required>
+            <input type="text" name="contact_value" required>
 
             <button type="button" onclick="<%= saveFunction %>">Enregistrer</button>
             <button type="button" onclick="closeModal('<%= modalId %>')">Annuler</button>

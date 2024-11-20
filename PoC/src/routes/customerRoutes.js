@@ -107,17 +107,17 @@ router.post('/api/customers', async (req, res) => {
 
 // Route pour obtenir la liste de tous les clients avec pagination
 router.get('/api/customers', async (req, res) => {
-    const { name, page = 1, limit = 400 } = req.query;
+    const { company_name, page = 1, limit = 50 } = req.query;
 
     try {
         const connection = await db.getConnection();
 
-        let query = 'SELECT * FROM customers';
+        let query = 'SELECT * FROM companies';
         const queryParams = [];
 
-        if (name) {
-            query += ' WHERE name LIKE ?';
-            queryParams.push(`${name}%`);
+        if (company_name) {
+            query += ' WHERE company_name LIKE ?';
+            queryParams.push(`${company_name}%`);
         }
 
         query += ' LIMIT ? OFFSET ?';
@@ -126,7 +126,6 @@ router.get('/api/customers', async (req, res) => {
         const [customers] = await connection.query(query, queryParams);
 
         connection.release();
-
         res.json(customers);
     } catch (error) {
         console.error('Erreur lors de la récupération des clients:', error);
@@ -141,7 +140,7 @@ router.get('/api/customers/:id', async (req, res) => {
     const customerId = req.params.id;
 
     try {
-        const [customerResults] = await db.query('SELECT * FROM customers WHERE id = ?', [customerId]);
+        const [customerResults] = await db.query('SELECT * FROM companies WHERE id = ?', [customerId]);
         if (customerResults.length === 0) {
             return res.status(404).json({ message: 'Client non trouvé.' });
         }
@@ -149,11 +148,10 @@ router.get('/api/customers/:id', async (req, res) => {
         const customer = customerResults[0];
 
         // Récupérer les adresses, contacts et moyens de communication liés au client
-        const [addresses] = await db.query('SELECT * FROM addresses WHERE customer_id = ?', [customerId]);
-        const [contacts] = await db.query('SELECT * FROM contacts WHERE customer_id = ?', [customerId]);
-        const [communicationMethods] = await db.query('SELECT * FROM communication_methods WHERE customer_id = ?', [customerId]);
+        const [addresses] = await db.query('SELECT * FROM company_addresses WHERE company_id = ?', [customerId]);
+        const [contacts] = await db.query('SELECT * FROM company_contacts WHERE company_id = ?', [customerId]);
+        const [communicationMethods] = await db.query('SELECT * FROM company_contacts_methods WHERE company_id = ?', [customerId]);
 
-        // Ajouter les détails à l'objet client
         customer.addresses = addresses;
         customer.contacts = contacts;
         customer.communicationMethods = communicationMethods;
@@ -174,14 +172,15 @@ router.put('/api/customers/:id', async (req, res) => {
     console.log(`Requête de mise à jour reçue pour le client ID: ${customerId}`);
     console.log('Données mises à jour:', updatedData);
 
-    const { name, notes } = updatedData;
+    const { company_name, created_by } = updatedData;
+    console.log(company_name, created_by);
 
     try {
         const connection = await db.getConnection();
 
         const [result] = await connection.query(
-            'UPDATE customers SET name = ?, notes = ? WHERE id = ?',
-            [name, notes, customerId]
+            'UPDATE companies SET company_name = ?, created_by = ? WHERE id = ?',
+            [company_name, created_by, customerId]
         );
 
         connection.release();
@@ -208,14 +207,14 @@ router.put('/api/customers/:customerId/addresses/:addressId', async (req, res) =
     console.log(`Requête de mise à jour reçue pour l'adresse ID: ${addressId} du client ID: ${customerId}`);
     console.log('Données mises à jour:', updatedAddress);
 
-    const { address_line1, address_line2, city, state, zip_code, country } = updatedAddress;
+    const {address } = updatedAddress;
 
     try {
         const connection = await db.getConnection();
 
         const [result] = await connection.query(
-            'UPDATE addresses SET address_line1 = ?, address_line2 = ?, city = ?, state = ?, zip_code = ?, country = ? WHERE customer_id = ? AND id = ?',
-            [address_line1, address_line2, city, state, zip_code, country, customerId, addressId]
+            'UPDATE company_addresses SET address = ? WHERE company_id = ? AND id = ?',
+            [address, customerId, addressId]
         );
 
         connection.release();
@@ -241,14 +240,14 @@ router.post('/api/customers/:customerId/addresses', async (req, res) => {
     console.log(`Requête de création reçue pour une nouvelle adresse du client ID: ${customerId}`);
     console.log('Données de la nouvelle adresse:', newAddress);
 
-    const { type, address_line1, address_line2, city, state, zip_code, country } = newAddress;
+    const { type,address } = newAddress;
 
     try {
         const connection = await db.getConnection();
 
         const [result] = await connection.query(
-            'INSERT INTO addresses (customer_id, type, address_line1, address_line2, city, state, zip_code, country) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-            [customerId, type, address_line1, address_line2, city, state, zip_code, country]
+            'INSERT INTO company_addresses (company_id, type,address) VALUES (?, ?, ?)',
+            [customerId, type, address]
         );
 
         connection.release();
@@ -277,7 +276,7 @@ router.delete('/api/customers/:customerId/addresses/:addressId', async (req, res
         const connection = await db.getConnection();
 
         const [result] = await connection.query(
-            'DELETE FROM addresses WHERE customer_id = ? AND id = ?',
+            'DELETE FROM company_addresses WHERE company_id = ? AND id = ?',
             [customerId, addressId]
         );
 
@@ -304,14 +303,14 @@ router.post('/api/customers/:customerId/contacts', async (req, res) => {
     console.log(`Requête de création reçue pour un nouveau contact du client ID: ${customerId}`);
     console.log('Données du nouveau contact:', newContact);
 
-    const { name, phone_number, email, direct_phone } = newContact;
+    const { name, mobile, email, direct_phone,contact_function } = newContact;
 
     try {
         const connection = await db.getConnection();
 
         const [result] = await connection.query(
-            'INSERT INTO contacts (customer_id, name, phone_number, email, direct_phone) VALUES (?, ?, ?, ?, ?)',
-            [customerId, name, phone_number, email, direct_phone]
+            'INSERT INTO company_contacts (company_id, name, mobile, email, direct_phone,contact_function) VALUES (?, ?, ?, ?, ?,?)',
+            [customerId, name, mobile, email, direct_phone,contact_function]
         );
 
         connection.release();
@@ -338,14 +337,14 @@ router.put('/api/customers/:customerId/contacts/:contactId', async (req, res) =>
     console.log(`Requête de mise à jour reçue pour le contact ID: ${contactId} du client ID: ${customerId}`);
     console.log('Données mises à jour:', updatedContact);
 
-    const { name, phone_number, email, direct_phone } = updatedContact;
+    const { name, mobile, email, direct_phone,contact_function } = updatedContact;
 
     try {
         const connection = await db.getConnection();
 
         const [result] = await connection.query(
-            'UPDATE contacts SET name = ?, phone_number = ?, email = ?, direct_phone = ? WHERE customer_id = ? AND id = ?',
-            [name, phone_number, email, direct_phone, customerId, contactId]
+            'UPDATE company_contacts SET name = ?, mobile = ?, email = ?, direct_phone = ?, contact_function = ? WHERE company_id = ? AND id = ?',
+            [name, mobile, email, direct_phone,contact_function, customerId, contactId]
         );
 
         connection.release();
@@ -374,7 +373,7 @@ router.delete('/api/customers/:customerId/contacts/:contactId', async (req, res)
         const connection = await db.getConnection();
 
         const [result] = await connection.query(
-            'DELETE FROM contacts WHERE customer_id = ? AND id = ?',
+            'DELETE FROM company_contacts WHERE company_id = ? AND id = ?',
             [customerId, contactId]
         );
 
@@ -401,14 +400,14 @@ router.post('/api/customers/:customerId/communicationMethods', async (req, res) 
     console.log(`Requête de création reçue pour une nouvelle méthode de communication du client ID: ${customerId}`);
     console.log('Données de la nouvelle méthode de communication:', newMethod);
 
-    const { method_type, details } = newMethod;
+    const { contact_type, contact_value } = newMethod;
 
     try {
         const connection = await db.getConnection();
 
         const [result] = await connection.query(
-            'INSERT INTO communication_methods (customer_id, method_type, details) VALUES (?, ?, ?)',
-            [customerId, method_type, details]
+            'INSERT INTO company_contacts_methods (company_id, contact_type, contact_value) VALUES (?, ?, ?)',
+            [customerId, contact_type, contact_value]
         );
 
         connection.release();
@@ -435,14 +434,14 @@ router.put('/api/customers/:customerId/communicationMethods/:methodId', async (r
     console.log(`Requête de mise à jour reçue pour la méthode de communication ID: ${methodId} du client ID: ${customerId}`);
     console.log('Données mises à jour:', updatedMethod);
 
-    const { method_type, details } = updatedMethod;
+    const { contact_type, contact_value } = updatedMethod;
 
     try {
         const connection = await db.getConnection();
 
         const [result] = await connection.query(
-            'UPDATE communication_methods SET method_type = ?, details = ? WHERE customer_id = ? AND id = ?',
-            [method_type, details, customerId, methodId]
+            'UPDATE company_contacts_methods SET contact_type = ?,contact_value = ? WHERE company_id = ? AND id = ?',
+            [contact_type, contact_value, customerId, methodId]
         );
 
         connection.release();
@@ -471,7 +470,7 @@ router.delete('/api/customers/:customerId/communicationMethods/:methodId', async
         const connection = await db.getConnection();
 
         const [result] = await connection.query(
-            'DELETE FROM communication_methods WHERE customer_id = ? AND id = ?',
+            'DELETE FROM company_contacts_methods WHERE company_id = ? AND id = ?',
             [customerId, methodId]
         );
 

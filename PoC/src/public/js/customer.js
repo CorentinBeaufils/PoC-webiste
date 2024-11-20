@@ -5,7 +5,7 @@ let contacts = [];
 let communicationMethods = [];
 let currentCustomer = null;
 let currentPage = 1;
-const limit = 400;
+const limit = 50;
 let isLoading = false;
 let hasMoreCustomers = true;
 let currentFilter = ''; //filter variable by name
@@ -43,7 +43,7 @@ async function loadCustomers(filter = '', page = 1, append = false) {
     isLoading = true;
 
     try {
-        const response = await fetch(`/api/customers?name=${encodeURIComponent(filter)}&page=${page}&limit=${limit}`);
+        const response = await fetch(`/api/customers?company_name=${encodeURIComponent(filter)}&page=${page}&limit=${limit}`);
         if (response.ok) {
             const customers = await response.json();
             if (customers.length < limit) {
@@ -90,7 +90,7 @@ function displayCustomerList(customers, append) {
     customers.forEach(customer => {
         const listItem = document.createElement('div');
         listItem.classList.add('customer-item');
-        listItem.textContent = customer.name; // Display the customer name
+        listItem.textContent = customer.company_name; // Display the customer name
 
         // Add a click event listener to load the customer details
         listItem.addEventListener('click', () => {
@@ -109,14 +109,14 @@ function filterCustomers() {
 }
 
 function displayCustomerDetails(customer) {
-    console.log('customer : ', customer);
+    console.log('customer details: ', customer);
     currentCustomer = customer; // Store the current customer in a global variable
 
     // display the customer details
     const customerInfo = document.getElementById('detailsCustomerInfo');
     customerInfo.innerHTML = `
-        <p><strong>Nom :</strong> <span id="customerName">${customer.name}</span></p>
-        <p><strong>Notes :</strong> <span id="customerNotes">${customer.notes}</span></p>
+        <p><strong>Nom :</strong> <span id="customerName">${customer.company_name}</span></p>
+        <p><strong>Created By :</strong> <span id="customerNotes">${customer.created_by}</span></p>
         <button onclick="editCustomerInfo()">Modifier</button>
     `;
 
@@ -153,6 +153,7 @@ function displayCustomerDetails(customer) {
     if (customer.communicationMethods && Array.isArray(customer.communicationMethods)) {
         console.log('Communication Methods: ', customer.communicationMethods);
         customer.communicationMethods.forEach((method, index) => {
+            console.log('Method:', method);
             communicationMethodsContainer.appendChild(createCommunicationMethodDiv(method, index));
         });
     } else {
@@ -175,10 +176,10 @@ function editCustomerInfo() {
     const customerInfo = document.getElementById('detailsCustomerInfo');
     customerInfo.innerHTML = `
         <label for="editCustomerName">Nom :</label>
-        <input type="text" id="editCustomerName" value="${currentCustomer.name}" required>
+        <input type="text" id="editCustomerName" value="${currentCustomer.company_name}" required>
 
         <label for="editCustomerNotes">Notes :</label>
-        <textarea id="editCustomerNotes">${currentCustomer.notes}</textarea>
+        <textarea id="editCustomerNotes">${currentCustomer.created_by}</textarea>
 
         <button onclick="saveCustomerInfo()">Enregistrer</button>
         <button onclick="cancelEditCustomerInfo()">Annuler</button>
@@ -201,8 +202,8 @@ function saveCustomerInfo() {
     const newName = document.getElementById('editCustomerName').value;
     const newNotes = document.getElementById('editCustomerNotes').value;
 
-    currentCustomer.name = newName;
-    currentCustomer.notes = newNotes;
+    currentCustomer.company_name = newName;
+    currentCustomer.created_by = newNotes;
 
     //send the updated customer data to the server
     fetch(`/api/customers/${currentCustomer.id}`, {
@@ -373,12 +374,7 @@ function saveNewAddress() {
 
     const newAddress = {
         type: form.elements['type'].value,
-        address_line1: form.elements['address_line1'].value,
-        address_line2: form.elements['address_line2'].value,
-        city: form.elements['city'].value,
-        state: form.elements['state'].value,
-        zip_code: form.elements['zip_code'].value,
-        country: form.elements['country'].value
+        address: form.elements['company-address'].value
     };
 
     // Send the new address data to the server
@@ -437,12 +433,7 @@ function editAddress(index) {
     // Fill the modal form with the address data
     const form = document.getElementById('editAddressForm');
     form.elements['type'].value = address.type;
-    form.elements['address_line1'].value = address.address_line1;
-    form.elements['address_line2'].value = address.address_line2;
-    form.elements['city'].value = address.city;
-    form.elements['state'].value = address.state;
-    form.elements['zip_code'].value = address.zip_code;
-    form.elements['country'].value = address.country;
+    form.elements['company-address'].value = address.address;
 
     // Add a data-index attribute to store the address index
     form.setAttribute('data-index', index);
@@ -459,12 +450,7 @@ function saveAddress() {
 
     const updatedAddress = {
         type: form.elements['type'].value, // Ne pas permettre la modification du type
-        address_line1: form.elements['address_line1'].value,
-        address_line2: form.elements['address_line2'].value,
-        city: form.elements['city'].value,
-        state: form.elements['state'].value,
-        zip_code: form.elements['zip_code'].value,
-        country: form.elements['country'].value
+        address: form.elements['company-address'].value
     };
 
     // Mettez à jour l'adresse dans l'objet customer
@@ -532,7 +518,7 @@ function removeAddress(index) {
 function createAddressTypeSection(address) {
     const addressTypeDiv = document.createElement('div');
     addressTypeDiv.classList.add('address-type');
-    addressTypeDiv.innerHTML = `<p>${address.type === 'main' ? 'Main' : 'Secondary'}</p>`;
+    addressTypeDiv.innerHTML = `<p>${address.type}</p>`;
     return addressTypeDiv;
 }
 
@@ -542,24 +528,7 @@ function createAddressElementsSection(address) {
 
     let addressContent = '';
 
-    if (address.address_line1 && address.address_line1 !== 'null') {
-        addressContent += `<span>${address.address_line1}</span>`;
-    }
-    if (address.address_line2 && address.address_line2 !== 'null') {
-        addressContent += `, <span>${address.address_line2}</span>`;
-    }
-    if (address.city && address.city !== 'null') {
-        addressContent += `, <span>${address.city}</span>`;
-    }
-    if (address.state && address.state !== 'null') {
-        addressContent += `, <span>${address.state}</span>`;
-    }
-    if (address.zip_code && address.zip_code !== 'null') {
-        addressContent += `, <span>${address.zip_code}</span>`;
-    }
-    if (address.country && address.country !== 'null') {
-        addressContent += `, <span>${address.country}</span>`;
-    }
+    addressContent += `<span>${address.address}</span>`;
 
     addressElementsDiv.innerHTML = addressContent;
     return addressElementsDiv;
@@ -618,9 +587,10 @@ function saveNewContact(button) {
 
     const newContact = {
         name: normalizeFieldValue(contactBlock.querySelector('input[name="name"]').value),
-        phone_number: normalizeFieldValue(contactBlock.querySelector('input[name="phone_number"]').value),
+        mobile: normalizeFieldValue(contactBlock.querySelector('input[name="mobile"]').value),
         email: normalizeFieldValue(contactBlock.querySelector('input[name="email"]').value),
-        direct_phone: normalizeFieldValue(contactBlock.querySelector('input[name="direct_phone"]').value)
+        direct_phone: normalizeFieldValue(contactBlock.querySelector('input[name="direct_phone"]').value),
+        contact_function: normalizeFieldValue(contactBlock.querySelector('input[name="contact-function"]').value)
     };
 
     // Si direct_phone est null, il prendra la valeur de phone_number et inversement
@@ -672,9 +642,10 @@ function saveNewContact() {
 
     const newContact = {
         name: form.elements['name'].value,
-        phone_number: form.elements['phone_number'].value,
+        phone_number: form.elements['mobile'].value,
         email: form.elements['email'].value,
-        direct_phone: form.elements['direct_phone'].value
+        direct_phone: form.elements['direct_phone'].value,
+        contact_function: form.elements['contact-function'].value
     };
 
     // Si direct_phone est null, il prendra la valeur de phone_number et inversement
@@ -716,13 +687,15 @@ function saveNewContact() {
 function editContact(index) {
     const customer = currentCustomer; // Utiliser la variable globale
     const contact = customer.contacts[index];
+    console.log('contact:', contact);
 
     // Remplir le formulaire du modal avec les données du contact
     const form = document.getElementById('editContactForm');
     form.elements['name'].value = contact.name;
-    form.elements['phone_number'].value = contact.phone_number;
+    form.elements['mobile'].value = contact.mobile;
     form.elements['email'].value = contact.email;
     form.elements['direct_phone'].value = contact.direct_phone;
+    form.elements['contact-function'].value = contact.contact_function;
 
     // Ajouter un attribut data-index pour stocker l'index du contact
     form.setAttribute('data-index', index);
@@ -739,9 +712,10 @@ function saveContact() {
 
     const updatedContact = {
         name: form.elements['name'].value,
-        phone_number: form.elements['phone_number'].value,
+        mobile: form.elements['mobile'].value,
         email: form.elements['email'].value,
-        direct_phone: form.elements['direct_phone'].value
+        direct_phone: form.elements['direct_phone'].value,
+        contact_function: form.elements['contact-function'].value
     };
 
     // Si direct_phone est null, il prendra la valeur de phone_number et inversement
@@ -840,9 +814,10 @@ function createContactDetailsSection(contact) {
     const contactDetailsDiv = document.createElement('div');
     contactDetailsDiv.classList.add('contact-details');
     contactDetailsDiv.innerHTML = `
-        <p><strong>Téléphone :</strong> ${contact.phone_number}</p>
+        <p><strong>Function :</strong> ${contact.contact_function}</p>
+        <p><strong>Mobile :</strong> ${contact.mobile}</p>
         <p><strong>Email :</strong> ${contact.email}</p>
-        <p><strong>Téléphone Direct :</strong> ${contact.direct_phone}</p>
+        <p><strong>Direct Phone :</strong> ${contact.direct_phone}</p>
     `;
     return contactDetailsDiv;
 }
@@ -1005,8 +980,8 @@ function editCommunicationMethod(index) {
 
     // Fill the modal form with the communication method data
     const form = document.getElementById('editCommunicationMethodForm');
-    form.elements['method_type'].value = method.method_type;
-    form.elements['details'].value = method.details;
+    form.elements['contact_type'].value = method.method_type;
+    form.elements['contact_value'].value = method.contact_value;
 
     // Add a data-index attribute to store the index of the communication method
     form.setAttribute('data-index', index);
@@ -1029,8 +1004,8 @@ function saveCommunicationMethod() {
     const methodId = customer.communicationMethods[index].id; // Ensure each communication method has a unique ID
 
     const updatedMethod = {
-        method_type: form.elements['method_type'].value,
-        details: form.elements['details'].value
+        method_type: form.elements['contact_type'].value,
+        details: form.elements['contact_value'].value
     };
 
     // Update the communication method in the customer object
@@ -1099,7 +1074,7 @@ function createCommunicationMethodDiv(method, index) {
 function createCommunicationMethodTypeSection(method) {
     const methodTypeDiv = document.createElement('div');
     methodTypeDiv.classList.add('customer-communication-method-type');
-    methodTypeDiv.innerHTML = `<p><strong>Type :</strong> ${method.method_type}</p>`;
+    methodTypeDiv.innerHTML = `<p><strong>Type :</strong> ${method.contact_type}</p>`;
     return methodTypeDiv;
 }
 
@@ -1112,7 +1087,7 @@ function createCommunicationMethodTypeSection(method) {
 function createCommunicationMethodDetailsSection(method) {
     const methodDetailsDiv = document.createElement('div');
     methodDetailsDiv.classList.add('customer-communication-method-details');
-    methodDetailsDiv.innerHTML = `<p><strong>Détails :</strong> ${method.details}</p>`;
+    methodDetailsDiv.innerHTML = `<p><strong>Détails :</strong> ${method.contact_value}</p>`;
     return methodDetailsDiv;
 }
 
@@ -1157,8 +1132,8 @@ function saveNewCommunicationMethod() {
     const form = document.getElementById('addCommunicationMethodForm');
 
     const newMethod = {
-        method_type: form.elements['method_type'].value,
-        details: form.elements['details'].value
+        contact_type: form.elements['contact_type'].value,
+        contact_value: form.elements['contact_value'].value
     };
 
     // Send the new communication method data to the server
