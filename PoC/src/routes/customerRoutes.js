@@ -4,11 +4,12 @@ import db from '../db.js'; // Assurez-vous que le chemin est correct
 import { verifierSession, verifierAdmin } from '../middleware/authMiddleware.js'; // Chemin correct vers les middlewares
 
 
-router.post('/api/customers', async (req, res) => {
-    const { infos, addresses, contacts, communicationMethods } = req.body;
-    console.log('Reception de requete /api/customers');
-    console.log(infos);
-    console.log(addresses);
+router.post('/api/customers',verifierSession, async (req, res) => {
+    const { name, keyword} = req.body;
+    console.log('Requête de création reçue pour un nouveau client');
+    console.log('Données du nouveau client:', req.body);
+    console.log('Utilisateur connecté:', req.session.user);
+
     // Obtenir une connexion unique depuis le pool
     const conn = await db.getConnection();
     console.log('Passage du getConnection');
@@ -16,86 +17,24 @@ router.post('/api/customers', async (req, res) => {
     try {
         await conn.beginTransaction();
         console.log("Début de la transaction");
-        // 1. Insérer le client sans `main_address_id` pour l'instant
+
+        // Insérer le client avec les dates de création et de dernière modification
         const [customerResult] = await conn.query(
-            'INSERT INTO customers (name, notes) VALUES (?, ?)',
-            [infos.name, infos.notes]
+            'INSERT INTO companies (company_name, keyword, created_by, creation_date, modification_date) VALUES (?, ?, ?, NOW(), NOW())',
+            [name, keyword, req.session.user.nom]
         );
         const customerId = customerResult.insertId;
         console.log("Client inséré avec succès, ID :", customerId);
 
-
-
-        let mainAddressId = null;
-
-        // 2. Insérer les adresses et obtenir l'ID de l'adresse principale
-        for (const address of addresses) {
-            const [addressResult] = await conn.query(
-                'INSERT INTO addresses (customer_id, type, address_line1, address_line2, city, state, zip_code, country) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-                [
-                    customerId,
-                    address.type,
-                    address.address_line1,
-                    address.address_line2,
-                    address.city,
-                    address.state,
-                    address.zip_code,
-                    address.country,
-                ]
-            );
-
-            if (address.type === 'main') {
-                mainAddressId = addressResult.insertId;
-            }
-            console.log("Adresse insérée :", address);
-        }
-
-        // 3. Mettre à jour `main_address_id` dans la table `customers`
-        if (mainAddressId) {
-            await conn.query(
-                'UPDATE customers SET main_address_id = ? WHERE id = ?',
-                [mainAddressId, customerId]
-            );
-            console.log("main_address_id mis à jour pour le client :", mainAddressId);
-        }
-
-        // 4. Insertion des contacts
-        for (const contact of contacts) {
-            await conn.query(
-                'INSERT INTO contacts (customer_id, name, phone_number, email, direct_phone) VALUES (?, ?, ?, ?, ?)',
-                [
-                    customerId,
-                    contact.name,
-                    contact.phone_number,
-                    contact.email,
-                    contact.direct_phone,
-                ]
-            );
-            console.log("Contact inséré :", contact);
-        }
-
-        // 5. Insertion des moyens de communication
-        for (const method of communicationMethods) {
-            await conn.query(
-                'INSERT INTO communication_methods (customer_id, method_type, details) VALUES (?, ?, ?)',
-                [
-                    customerId,
-                    method.method_type,
-                    method.details,
-                ]
-            );
-            console.log("Moyen de communication inséré :", method);
-        }
-
         // Valider la transaction
         await conn.commit();
         console.log("Transaction confirmée");
-        res.status(201).json({ message: 'Client et ses informations créés avec succès.' });
+        res.status(201).json({ message: 'Client créé avec succès.', customerId: customerId });
 
     } catch (error) {
-        console.error('Erreur lors de la création du client et de ses informations:', error);
+        console.error('Erreur lors de la création du client:', error);
         await conn.rollback();  // Annuler la transaction en cas d'erreur
-        res.status(500).json({ message: 'Erreur lors de la création du client et de ses informations.' });
+        res.status(500).json({ message: 'Erreur lors de la création du client.' });
     } finally {
         conn.release();  // Libérer la connexion pour le pool
     }

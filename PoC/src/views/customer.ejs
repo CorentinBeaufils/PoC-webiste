@@ -20,10 +20,10 @@
 
         <!-- Menu de navigation pour basculer entre les sections -->
         <div class="customer-nav">
-            <button onclick="showSection('createCustomer')" >Créer un Client</button>
-            <button onclick="showSection('viewCustomers')">Voir les Clients</button>
-            <button onclick="showSection('communications')">Communications / Notes</button>
-            <button onclick="showSection('orders')">Commandes</button>
+            <button onclick="showSection('createCustomer')" >Create Customer</button>
+            <button onclick="showSection('viewCustomers')">Customer List</button>
+            <button onclick="showSection('communications')">communications / notes</button>
+            <button onclick="showSection('orders')">Orders</button>
         </div>
 
     <!-- Inclure le partial pour le modal d'édition d'adresse -->
@@ -49,7 +49,7 @@
     <!-- Inclure le partial pour le modal d'édition de contact -->
     <%- include('partials/modal_contact', { 
         modalId: 'editContactModal', 
-        modalTitle: 'Modifier le Contact', 
+        modalTitle: 'Edit Contact', 
         formId: 'editContactForm', 
         saveFunction: 'saveContact()'
     }) %>
@@ -57,7 +57,7 @@
     <!-- Inclure le partial pour le modal d'ajout de contact -->
     <%- include('partials/modal_contact', { 
         modalId: 'addContactModal', 
-        modalTitle: 'Ajouter un Nouveau Contact', 
+        modalTitle: 'Add New Contact', 
         formId: 'addContactForm', 
         saveFunction: 'saveNewContact()'
     }) %>
@@ -65,7 +65,7 @@
     <!-- Inclure le partial pour le modal d'édition de méthode de communication -->
     <%- include('partials/modal_communication_method', { 
         modalId: 'editCommunicationMethodModal', 
-        modalTitle: 'Modifier la Méthode de Communication', 
+        modalTitle: 'Edit Communication Method', 
         formId: 'editCommunicationMethodForm', 
         saveFunction: 'saveCommunicationMethod()'
     }) %>
@@ -73,148 +73,80 @@
     <!-- Inclure le partial pour le modal d'ajout de méthode de communication -->
     <%- include('partials/modal_communication_method', { 
         modalId: 'addCommunicationMethodModal', 
-        modalTitle: 'Ajouter une Nouvelle Méthode de Communication', 
+        modalTitle: 'Add new Communication Method', 
         formId: 'addCommunicationMethodForm', 
         saveFunction: 'saveNewCommunicationMethod()'
     }) %>
 
         <!-- Section pour créer un client -->
-        <section id="createCustomer" class="main-section customer-section">
-            <h2>Informations du Client</h2>
-            <form id="customerForm">
-                <!-- Informations de base du client -->
-                <div id="infosCustommers">
-                    <div class="info-block">
-                        <label for="customerName">Nom du Client :</label>
-                        <input type="text" id="customerName" name="name" required>
-
-                        <label for="customerNotes">Notes :</label>
-                        <textarea id="customerNotes" name="notes"></textarea>
-                    </div>
-                </div>
-
-                <!-- Section pour les adresses -->
-                <div class="section-divider"></div>
-                <h3>Adresses</h3>
-                <div id="addressesContainer">
-                    <div class="address-block">
-                        <label for="addressType">Type d'Adresse :</label>
-                        <select id="addressType" name="type" disabled>
-                            <option value="main" selected>Principale</option>
-                        </select>
-
-                        <label for="addressLine1">Adresse Ligne 1 :</label>
-                        <input type="text" id="addressLine1" name="address_line1" required>
-
-                        <label for="addressLine2">Adresse Ligne 2 :</label>
-                        <input type="text" id="addressLine2" name="address_line2">
-
-                        <label for="city">Ville :</label>
-                        <input type="text" id="city" name="city">
-
-                        <label for="state">État :</label>
-                        <input type="text" id="state" name="state">
-
-                        <label for="zipCode">Code Postal :</label>
-                        <input type="text" id="zipCode" name="zip_code">
-
-                        <label for="country">Pays :</label>
-                        <input type="text" id="country" name="country">
-                    </div>
-                </div>
-                <button type="button" onclick="addNewAddressBlock()">Ajouter une Adresse Annexe</button>
-
-                <!-- Section pour les contacts -->
-                <div class="section-divider"></div>
-                <h3>Contacts</h3>
-                <div id="contactsContainer">
-                    <div class="contact-block">
-                        <label for="contactName">Nom du Contact :</label>
-                        <input type="text" id="contactName" name="name" required>
-
-                        <label for="contactPhone">Numéro de Téléphone :</label>
-                        <input type="tel" id="contactPhone" name="phone_number">
-
-                        <label for="contactEmail">Email :</label>
-                        <input type="email" id="contactEmail" name="email">
-
-                        <label for="contactDirectPhone">Téléphone Direct :</label>
-                        <input type="tel" id="contactDirectPhone" name="direct_phone">
-                    </div>
-                </div>
-                <button type="button" onclick="addNewContactBlock()">Ajouter un Nouveau Contact</button>
-
-                <!-- Section pour les moyens de communication -->
-                <div class="section-divider"></div>
-                <h3>Moyens de Communication Supplémentaires</h3>
-                <div id="communicationMethodForm">
-                    <div class="communication-method-block">
-                        <label for="methodType">Type de Moyen :</label>
-                        <input type="text" id="methodType" name="method_type">
-
-                        <label for="methodDetails">Détails :</label>
-                        <input type="text" id="methodDetails" name="details">
-                    </div>
-                </div>
-                <button type="button" onclick="addNewCommunicationMethodBlock()">Ajouter un Moyen de Communication</button>
-
-                <!-- Bouton pour enregistrer le client avec toutes les informations -->
-                <button type="submit">Enregistrer le Client avec les Informations Complètes</button>
+        <section id="createCustomer" class="main-section customer-section" style="display: none;">
+            <h2>Create Customer</h2>
+            <form id="createCustomerForm">
+                <label for="customerName">Customer Name :</label>
+                <input type="text" id="customerName" name="name" required>
+                <label for="customerName">Keywork :</label>
+                <input type="text" id="customerKeyword" name="keyword" required>
+                <button type="submit">Create Customer</button>
             </form>
+
+            <!-- Conteneur pour le bouton de retour -->
+            <div class="return-button-container">
+                <button onclick="showSection('viewCustomers')">Customer List</button>
+            </div>
         </section>
 
         <!-- Nouvelle section pour voir la liste des clients -->
-        <section id="viewCustomers" class="main-section customer-section" style="display: none;">
+        <section id="viewCustomers" class="main-section customer-section" style="display: block;">
             <div id="customerList">
-                <h2>Liste des Clients</h2>
+                <h2>Customer List</h2>
                 <div>
-                    <input type="text" id="filterName" placeholder="Filtrer par nom">
-                    <button onclick="filterCustomers()">Filtrer</button>
+                    <input type="text" id="filterName" placeholder="Filter by name">
+                    <button onclick="filterCustomers()">Filter</button>
                 </div>
                 <div id="customerContainer"></div> <!-- Conteneur pour la liste des clients -->
             </div>
 
             <!-- Section pour afficher les détails d'un client -->
             <section id="customerDetails" class="sub-section" style="display: none;">
-                <h2>Détails du Client</h2>
+                <h2>Customer Details</h2>
                 <div id="detailsCustomerInfo" class="info-block"></div>
 
                 <h3>Adresses</h3>
                 <div class="header-container">
                     <div class="customer-detail-address header">
                         <div class="address-type"><strong>Type</strong></div>
-                        <div class="address-elements"><strong>Adresse</strong></div>
+                        <div class="address-elements"><strong>Adress</strong></div>
                         <div class="address-buttons"><strong>Action</strong></div>
                     </div>
                 </div>
                 <div id="detailsAddressesContainer" class="customer-grid"></div>
-                <button onclick="addNewAddress()">Ajouter une adresse</button>
+                <button onclick="addNewAddress()">Add New Address</button>
 
                 <h3>Contacts</h3>
                 <div class="header-container">
                     <div class="customer-detail-contact header">
-                        <div class="contact-name"><strong>Nom</strong></div>
-                        <div class="contact-details"><strong>Détails</strong></div>
+                        <div class="contact-name"><strong>Name</strong></div>
+                        <div class="contact-details"><strong>Details</strong></div>
                         <div class="contact-buttons"><strong>Action</strong></div>
                     </div>
                 </div>
                 <div id="detailsContactsContainer" class="customer-grid"></div>
-                <button onclick="addNewContact()">Ajouter un contact</button>
+                <button onclick="addNewContact()">Add a Contact</button>
 
-                <h3>Méthodes de Communication</h3>
+                <h3>Communication Methods</h3>
                 <div class="header-container">
                     <div class="customer-communication-method header">
                         <div class="communication-method-type"><strong>Type</strong></div>
-                        <div class="communication-method-details"><strong>Détails</strong></div>
+                        <div class="communication-method-details"><strong>Details</strong></div>
                         <div class="communication-method-buttons"><strong>Action</strong></div>
                     </div>
                 </div>
                 <div id="detailsCommunicationMethodsContainer" class="customer-grid"></div>
-                <button onclick="addNewCommunicationMethod()">Ajouter une méthode de communication</button>
+                <button onclick="addNewCommunicationMethod()">Add a Communication Method</button>
 
                 <!-- Conteneur pour le bouton de retour -->
                 <div class="return-button-container">
-                    <button onclick="showSection('viewCustomers')">Retour à la liste des clients</button>
+                    <button onclick="showSection('viewCustomers')">Customer List</button>
                 </div>
             </section>
         </section>

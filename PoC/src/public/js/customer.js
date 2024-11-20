@@ -117,7 +117,7 @@ function displayCustomerDetails(customer) {
     customerInfo.innerHTML = `
         <p><strong>Nom :</strong> <span id="customerName">${customer.company_name}</span></p>
         <p><strong>Created By :</strong> <span id="customerNotes">${customer.created_by}</span></p>
-        <button onclick="editCustomerInfo()">Modifier</button>
+        <button onclick="editCustomerInfo()">Edit</button>
     `;
 
     // display the addresses
@@ -209,7 +209,8 @@ function saveCustomerInfo() {
     fetch(`/api/customers/${currentCustomer.id}`, {
         method: 'PUT',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'credentials': 'same-origin'
         },
         body: JSON.stringify(currentCustomer)
     })
@@ -293,7 +294,8 @@ function saveNewAddress(button) {
     fetch(`/api/customers/${currentCustomer.id}/addresses`, {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'credentials': 'same-origin'
         },
         body: JSON.stringify(newAddress)
     })
@@ -381,7 +383,8 @@ function saveNewAddress() {
     fetch(`/api/customers/${currentCustomer.id}/addresses`, {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'credentials': 'same-origin'
         },
         body: JSON.stringify(newAddress)
     })
@@ -460,7 +463,8 @@ function saveAddress() {
     fetch(`/api/customers/${customer.id}/addresses/${addressId}`, {
         method: 'PUT',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'credentials': 'same-origin'
         },
         body: JSON.stringify(updatedAddress)
     })
@@ -496,7 +500,8 @@ function removeAddress(index) {
     fetch(`/api/customers/${customer.id}/addresses/${addressId}`, {
         method: 'DELETE',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'credentials': 'same-origin'
         }
     })
         .then(response => {
@@ -538,7 +543,7 @@ function createAddressButtonsSection(address, index) {
     const addressButtonsDiv = document.createElement('div');
     addressButtonsDiv.classList.add('address-buttons');
     addressButtonsDiv.innerHTML = `
-        ${address.type !== 'main' ? `<button onclick="event.stopPropagation(); removeAddress(${index})">Supprimer</button>` : ''}
+        ${address.type !== 'main' ? `<button onclick="event.stopPropagation(); removeAddress(${index})">Delete</button>` : ''}
     `;
     return addressButtonsDiv;
 }
@@ -604,7 +609,8 @@ function saveNewContact(button) {
     fetch(`/api/customers/${currentCustomer.id}/contacts`, {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'credentials': 'same-origin'
         },
         body: JSON.stringify(newContact)
     })
@@ -659,7 +665,8 @@ function saveNewContact() {
     fetch(`/api/customers/${currentCustomer.id}/contacts`, {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'credentials': 'same-origin'
         },
         body: JSON.stringify(newContact)
     })
@@ -732,7 +739,8 @@ function saveContact() {
     fetch(`/api/customers/${customer.id}/contacts/${contactId}`, {
         method: 'PUT',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'credentials': 'same-origin'
         },
         body: JSON.stringify(updatedContact)
     })
@@ -763,7 +771,8 @@ function removeContact(index) {
     fetch(`/api/customers/${customer.id}/contacts/${contactId}`, {
         method: 'DELETE',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'credentials': 'same-origin'
         }
     })
         .then(response => {
@@ -826,7 +835,7 @@ function createContactButtonsSection(contact, index) {
     const contactButtonsDiv = document.createElement('div');
     contactButtonsDiv.classList.add('contact-buttons');
     contactButtonsDiv.innerHTML = `
-        <button onclick="event.stopPropagation(); removeContact(${index})">Supprimer</button>
+        <button onclick="event.stopPropagation(); removeContact(${index})">Delete</button>
     `;
     return contactButtonsDiv;
 }
@@ -899,7 +908,8 @@ function removeCommunicationMethod(index) {
     fetch(`/api/customers/${customer.id}/communicationMethods/${methodId}`, {
         method: 'DELETE',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'credentials': 'same-origin'
         }
     })
         .then(response => {
@@ -944,7 +954,8 @@ function saveCommunicationMethod(button) {
     fetch(`/api/customers/${currentCustomer.id}/communicationMethods`, {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'credentials': 'same-origin'
         },
         body: JSON.stringify(newMethod)
     })
@@ -1015,7 +1026,8 @@ function saveCommunicationMethod() {
     fetch(`/api/customers/${customer.id}/communicationMethods/${methodId}`, {
         method: 'PUT',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'credentials': 'same-origin'
         },
         body: JSON.stringify(updatedMethod)
     })
@@ -1103,7 +1115,7 @@ function createCommunicationMethodButtonsSection(method, index) {
     const methodButtonsDiv = document.createElement('div');
     methodButtonsDiv.classList.add('customer-communication-method-buttons');
     methodButtonsDiv.innerHTML = `
-        <button onclick="event.stopPropagation(); removeCommunicationMethod(${index})">Supprimer</button>
+        <button onclick="event.stopPropagation(); removeCommunicationMethod(${index})">Delete</button>
     `;
     return methodButtonsDiv;
 }
@@ -1140,7 +1152,8 @@ function saveNewCommunicationMethod() {
     fetch(`/api/customers/${currentCustomer.id}/communicationMethods`, {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'credentials': 'same-origin'
         },
         body: JSON.stringify(newMethod)
     })
@@ -1186,74 +1199,107 @@ function showSection(sectionId) {
     }
 }
 
-// 8. Gestion des Formulaires
-/**
- * Handles the form submission for creating or updating a customer.
- * Collects customer information, addresses, contacts, and communication methods,
- * and sends the data to the server.
- */
-document.getElementById('customerForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
+// // 8. Gestion des Formulaires
+// /**
+//  * Handles the form submission for creating or updating a customer.
+//  * Collects customer information, addresses, contacts, and communication methods,
+//  * and sends the data to the server.
+//  */
+// document.getElementById('customerForm').addEventListener('submit', async (e) => {
+//     e.preventDefault();
 
-    // Collect basic customer information
-    const infos = {
-        name: normalizeFieldValue(document.getElementById('customerName').value),
-        notes: normalizeFieldValue(document.getElementById('customerNotes').value)
+//     // Collect basic customer information
+//     const infos = {
+//         name: normalizeFieldValue(document.getElementById('customerName').value),
+//         notes: normalizeFieldValue(document.getElementById('customerNotes').value)
+//     };
+
+//     // Collect addresses
+//     const addressElements = document.querySelectorAll('#addressesContainer .address-block');
+//     const addresses = Array.from(addressElements).map(addressElement => {
+//         return {
+//             type: normalizeFieldValue(addressElement.querySelector('select[name="type"]').value),
+//             address_line1: normalizeFieldValue(addressElement.querySelector('input[name="address_line1"]').value),
+//             address_line2: normalizeFieldValue(addressElement.querySelector('input[name="address_line2"]').value),
+//             city: normalizeFieldValue(addressElement.querySelector('input[name="city"]').value),
+//             state: normalizeFieldValue(addressElement.querySelector('input[name="state"]').value),
+//             zip_code: normalizeFieldValue(addressElement.querySelector('input[name="zip_code"]').value),
+//             country: normalizeFieldValue(addressElement.querySelector('input[name="country"]').value)
+//         };
+//     });
+
+//     // Collect contacts
+//     const contactElements = document.querySelectorAll('#contactsContainer .contact-block');
+//     const contacts = Array.from(contactElements).map(contactElement => {
+//         return {
+//             name: normalizeFieldValue(contactElement.querySelector('input[name="name"]').value),
+//             phone_number: normalizeFieldValue(contactElement.querySelector('input[name="phone_number"]').value),
+//             email: normalizeFieldValue(contactElement.querySelector('input[name="email"]').value),
+//             direct_phone: normalizeFieldValue(contactElement.querySelector('input[name="direct_phone"]').value)
+//         };
+//     });
+
+//     // Collect communication methods
+//     const methodElements = document.querySelectorAll('#communicationMethodForm .communication-method-block');
+//     const communicationMethods = Array.from(methodElements).map(methodElement => {
+//         return {
+//             method_type: normalizeFieldValue(methodElement.querySelector('input[name="method_type"]').value),
+//             details: normalizeFieldValue(methodElement.querySelector('input[name="details"]').value)
+//         };
+//     });
+
+//     // Send the data to the server
+//     try {
+//         const response = await fetch('/api/customers', {
+//             method: 'POST',
+//             headers: {
+//                 'Content-Type': 'application/json'
+//             },
+//             body: JSON.stringify({ infos, addresses, contacts, communicationMethods })
+//         });
+
+//         if (response.ok) {
+//             showMessage('Client enregistré avec succès.');
+//             loadCustomers();
+//         } else {
+//             showMessage('Erreur lors de l\'enregistrement du client.', true);
+//         }
+//     } catch (error) {
+//         console.error('Erreur lors de l\'enregistrement du client:', error);
+//         showMessage('Erreur lors de l\'enregistrement du client.', true);
+//     }
+// });
+
+document.getElementById('createCustomerForm').addEventListener('submit', async function(event) {
+    event.preventDefault(); // Empêcher le rechargement de la page
+
+    const formData = new FormData(this);
+    const customerData = {
+        name: normalizeFieldValue(formData.get('name')),
+        keyword: normalizeFieldValue(formData.get('keyword'))
     };
-
-    // Collect addresses
-    const addressElements = document.querySelectorAll('#addressesContainer .address-block');
-    const addresses = Array.from(addressElements).map(addressElement => {
-        return {
-            type: normalizeFieldValue(addressElement.querySelector('select[name="type"]').value),
-            address_line1: normalizeFieldValue(addressElement.querySelector('input[name="address_line1"]').value),
-            address_line2: normalizeFieldValue(addressElement.querySelector('input[name="address_line2"]').value),
-            city: normalizeFieldValue(addressElement.querySelector('input[name="city"]').value),
-            state: normalizeFieldValue(addressElement.querySelector('input[name="state"]').value),
-            zip_code: normalizeFieldValue(addressElement.querySelector('input[name="zip_code"]').value),
-            country: normalizeFieldValue(addressElement.querySelector('input[name="country"]').value)
-        };
-    });
-
-    // Collect contacts
-    const contactElements = document.querySelectorAll('#contactsContainer .contact-block');
-    const contacts = Array.from(contactElements).map(contactElement => {
-        return {
-            name: normalizeFieldValue(contactElement.querySelector('input[name="name"]').value),
-            phone_number: normalizeFieldValue(contactElement.querySelector('input[name="phone_number"]').value),
-            email: normalizeFieldValue(contactElement.querySelector('input[name="email"]').value),
-            direct_phone: normalizeFieldValue(contactElement.querySelector('input[name="direct_phone"]').value)
-        };
-    });
-
-    // Collect communication methods
-    const methodElements = document.querySelectorAll('#communicationMethodForm .communication-method-block');
-    const communicationMethods = Array.from(methodElements).map(methodElement => {
-        return {
-            method_type: normalizeFieldValue(methodElement.querySelector('input[name="method_type"]').value),
-            details: normalizeFieldValue(methodElement.querySelector('input[name="details"]').value)
-        };
-    });
-
-    // Send the data to the server
+    console.log('customerData:', customerData);
     try {
         const response = await fetch('/api/customers', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'credentials': 'same-origin'
             },
-            body: JSON.stringify({ infos, addresses, contacts, communicationMethods })
+            body: JSON.stringify(customerData)
         });
 
+        const result = await response.json();
         if (response.ok) {
-            showMessage('Client enregistré avec succès.');
-            loadCustomers();
+            alert('Client créé avec succès');
+            showSection('viewCustomers');
+            loadCustomerDetails(result.customerId);
         } else {
-            showMessage('Erreur lors de l\'enregistrement du client.', true);
+            alert('Erreur : ' + result.message);
         }
     } catch (error) {
-        console.error('Erreur lors de l\'enregistrement du client:', error);
-        showMessage('Erreur lors de l\'enregistrement du client.', true);
+        console.error('Erreur lors de la création du client:', error);
+        alert('Erreur lors de la création du client');
     }
 });
 

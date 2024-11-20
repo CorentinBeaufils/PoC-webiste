@@ -7,8 +7,8 @@ file_path = 'C:/Users/trice/Documents/sf8custommerdb.xlsx'
 df = pd.read_excel(file_path)
 
 # Noms des colonnes à comparer
-column1 = 'Customer_Address::Complete_Address'  # Remplacez par le nom de la première colonne
-column2 = 'Customer_Address::Address_Type'  # Remplacez par le nom de la deuxième colonne
+column1 = 'Customer_Main_Address_Number::Number_Type'  # Remplacez par le nom de la première colonne
+column2 = 'Customer_Number::Number_Type'  # Remplacez par le nom de la deuxième colonne
 
 # Vérifier si les colonnes existent dans le DataFrame
 if column1 not in df.columns or column2 not in df.columns:
