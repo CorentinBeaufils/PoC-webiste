@@ -4,10 +4,10 @@
         <span class="custom-close" onclick="closeModal('<%= modalId %>')">&times;</span>
         <h2><%= modalTitle %></h2>
         <form id="<%= formId %>">
-            <label>Type de Méthode :</label>
+            <label>Method Type :</label>
             <input type="text" name="contact_type" required>
 
-            <label>Détails :</label>
+            <label>Details :</label>
             <input type="text" name="contact_value" required>
 
             <button type="button" onclick="<%= saveFunction %>">Enregistrer</button>

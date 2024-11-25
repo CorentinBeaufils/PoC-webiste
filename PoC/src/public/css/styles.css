@@ -80,17 +80,3 @@ td {
     max-width: 300px;
     /* Ajuster cette valeur selon tes besoins */
 }
-
-
-/* Loader pour indiquer que les données se chargent */
-#loader {
-    display: none;
-    /* Masqué par défaut */
-    text-align: center;
-    margin-top: 20px;
-}
-
-#loader.active {
-    display: block;
-    /* Affiché quand la classe "active" est ajoutée */
-}

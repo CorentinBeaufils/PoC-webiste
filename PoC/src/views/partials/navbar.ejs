@@ -1,10 +1,9 @@
 <!-- src/views/partials/navbar.ejs -->
 <nav class="navbar-main">
     <ul>
+        <li><a href="/home" class="navBtn">Home</a></li>
         <li><a href="/user"  class="navBtn <%= user.role !== 'admin' ? 'disabled' : '' %>">User/Admin</a></li>
         <li><a href="/customer" class="navBtn">Customer</a></li>
-        <li><a href="/dossier" class="navBtn">Créer un Dossier</a></li>
-        <li><a href="/dossier_list" class="navBtn">Voir les Dossiers</a></li>
         <li>
             <div class="dropdown">
                 <button onclick="myFunction()" class="dropbtn">My profile</button>

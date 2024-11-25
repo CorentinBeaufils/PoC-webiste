@@ -15,9 +15,6 @@
 <body>
     <!-- Inclure la barre de navigation -->
     <%- include('partials/navbar') %>
-
-        <h1>Gestion des Clients</h1>
-
         <!-- Menu de navigation pour basculer entre les sections -->
         <div class="customer-nav">
             <button onclick="showSection('createCustomer')" >Create Customer</button>
@@ -100,7 +97,12 @@
             <div id="customerList">
                 <h2>Customer List</h2>
                 <div>
-                    <input type="text" id="filterName" placeholder="Filter by name">
+                    <select id="filterType">
+                        <option value="name">Filter by name</option>
+                        <option value="keyword">Filter by keyword</option>
+                        <option value="contact">Filter by contact</option>
+                    </select>
+                    <input type="text" id="filterValue" placeholder="Enter filter value">
                     <button onclick="filterCustomers()">Filter</button>
                 </div>
                 <div id="customerContainer"></div> <!-- Conteneur pour la liste des clients -->

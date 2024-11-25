@@ -41,6 +41,7 @@ app.set('views', path.join(__dirname, 'src/views'));
 app.use(express.static(path.join(__dirname, 'src/public')));
 
 // Utilisez les routes pour les clients
+
 app.use(customerRoutes);
 app.use(userRoutes);
 
@@ -81,16 +82,17 @@ app.get('/user', verifierSession,verifierAdmin, (req, res) => {
     res.render('user', { user: req.session.user });
 });
 
-app.get('/dossier', verifierSession, (req, res) => {
-    res.render('dossier');
-});
-
-app.get('/dossier_list', verifierSession, (req, res) => {
-    res.render('dossier_list');
-});
 
 app.get('/customer',verifierSession, (req,res) => {
     res.render('customer', { user: req.session.user });
+});
+
+app.get('/home', (req, res) => {
+    if (!req.session.user) {
+        return res.redirect('/login');
+    }
+
+    res.render('home', { user: req.session.user });
 });
 
 
@@ -108,7 +110,8 @@ app.post('/inscription', verifierAdmin, async (req, res) => {
             [nom, email, mot_de_passe_hache, role]
         );
 
-        
+        // Envoyer une réponse de succès
+        res.status(201).json({ message: 'Utilisateur créé avec succès.', userId: result.insertId });
     } catch (err) {
         console.error('Erreur lors de la création de l’utilisateur :', err);
         res.status(500).json({ message: 'Erreur lors de la création de l\'utilisateur.' });
@@ -171,11 +174,12 @@ app.post('/connexion', async (req, res) => {
             id: utilisateur.id,
             nom : utilisateur.nom,
             email: utilisateur.email,
-            role: utilisateur.role
+            role: utilisateur.role,
+            startTime: Date.now()
         };
 
         console.log("Connexion réussie, redirection vers /user");
-        res.redirect('/customer');
+        res.redirect('/home');
     } catch (err) {
         console.error("Erreur de serveur :", err);
         res.status(500).send('Erreur de serveur.');

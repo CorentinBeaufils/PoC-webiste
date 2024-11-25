@@ -9,6 +9,7 @@ const limit = 50;
 let isLoading = false;
 let hasMoreCustomers = true;
 let currentFilter = ''; //filter variable by name
+let currentFilterType = ''; //filter variable by name
 
 
 // 2.utils
@@ -26,24 +27,27 @@ function isBlockEmpty(block) {
     return Object.values(block).every(value => value === null);
 }
 
-//logout function
-document.getElementById('logoutButton')?.addEventListener('click', () => {
-    fetch('/logout', { method: 'POST' })
-        .then(() => {
-            window.location.href = '/login';
-        })
-        .catch(error => {
-            console.error('Erreur lors de la déconnexion:', error);
-        });
-});
+
 // 3. Customer Management
+
+// Function to load the next page of customers when scrolling
+function filterCustomers() {
+    const filterType = document.getElementById('filterType').value;
+    const filterValue = document.getElementById('filterValue').value;
+    console.log('Filter:', filterType, filterValue);
+    hasMoreCustomers = true; // Reset the flag to allow loading more customers
+    loadCustomers(filterType,filterValue);
+}
+
 // Function to load and display the list of customers with pagination
-async function loadCustomers(filter = '', page = 1, append = false) {
+async function loadCustomers(filterType = 'name',filterValue = '', page = 1, append = false) {
     if (isLoading || !hasMoreCustomers) return;
     isLoading = true;
 
+    console.log('Loading customers:', filterType, filterValue, page);
+
     try {
-        const response = await fetch(`/api/customers?company_name=${encodeURIComponent(filter)}&page=${page}&limit=${limit}`);
+        const response = await fetch(`/api/customers?filterType=${encodeURIComponent(filterType)}&company_name=${encodeURIComponent(filterValue)}&page=${page}&limit=${limit}`);
         if (response.ok) {
             const customers = await response.json();
             if (customers.length < limit) {
@@ -51,7 +55,8 @@ async function loadCustomers(filter = '', page = 1, append = false) {
             }
             displayCustomerList(customers, append);
             currentPage = page;
-            currentFilter = filter; //update the current filter
+            currentFilter = filterValue; //update the current filter
+            currentFilterType = filterType; //update the current filter
         } else {
             showMessage('Erreur lors du chargement des clients.', true);
         }
@@ -101,12 +106,7 @@ function displayCustomerList(customers, append) {
     });
 }
 
-// Function to load the next page of customers when scrolling
-function filterCustomers() {
-    const filterName = document.getElementById('filterName').value;
-    hasMoreCustomers = true; // Reset the flag to allow loading more customers
-    loadCustomers(filterName);
-}
+
 
 function displayCustomerDetails(customer) {
     console.log('customer details: ', customer);
@@ -117,6 +117,8 @@ function displayCustomerDetails(customer) {
     customerInfo.innerHTML = `
         <p><strong>Nom :</strong> <span id="customerName">${customer.company_name}</span></p>
         <p><strong>Created By :</strong> <span id="customerNotes">${customer.created_by}</span></p>
+        <p><strong>Keyword :</strong> <span id="customerKeyword">${customer.keyword}</span></p>
+        <p><strong>Creation Date :</strong> <span id="customerCreated">${customer.creation_date}</span></p>
         <button onclick="editCustomerInfo()">Edit</button>
     `;
 
@@ -178,8 +180,11 @@ function editCustomerInfo() {
         <label for="editCustomerName">Nom :</label>
         <input type="text" id="editCustomerName" value="${currentCustomer.company_name}" required>
 
-        <label for="editCustomerNotes">Notes :</label>
-        <textarea id="editCustomerNotes">${currentCustomer.created_by}</textarea>
+        <label for="editCustomerCreatedBy">CreatedBy :</label>
+        <textarea id="editCustomerCreatedBy">${currentCustomer.created_by}</textarea>
+        
+        <label for="editCustomerKeyword">Keyword :</label>
+        <textarea id="editCustomerKeyword">${currentCustomer.keyword}</textarea>
 
         <button onclick="saveCustomerInfo()">Enregistrer</button>
         <button onclick="cancelEditCustomerInfo()">Annuler</button>
@@ -200,10 +205,12 @@ function editCustomerInfo() {
  */
 function saveCustomerInfo() {
     const newName = document.getElementById('editCustomerName').value;
-    const newNotes = document.getElementById('editCustomerNotes').value;
+    const newNotes = document.getElementById('editCustomerCreatedBy').value;
+    const newKeyword = document.getElementById('editCustomerKeyword').value;
 
     currentCustomer.company_name = newName;
     currentCustomer.created_by = newNotes;
+    currentCustomer.keyword = newKeyword;
 
     //send the updated customer data to the server
     fetch(`/api/customers/${currentCustomer.id}`, {
@@ -823,7 +830,7 @@ function createContactDetailsSection(contact) {
     const contactDetailsDiv = document.createElement('div');
     contactDetailsDiv.classList.add('contact-details');
     contactDetailsDiv.innerHTML = `
-        <p><strong>Function :</strong> ${contact.contact_function}</p>
+        <p><strong>Position :</strong> ${contact.contact_function}</p>
         <p><strong>Mobile :</strong> ${contact.mobile}</p>
         <p><strong>Email :</strong> ${contact.email}</p>
         <p><strong>Direct Phone :</strong> ${contact.direct_phone}</p>
@@ -1313,7 +1320,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Ajouter un écouteur de défilement pour le lazy loading
     window.addEventListener('scroll', () => {
         if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500) {
-            loadCustomers(currentFilter, currentPage + 1, true); // Utiliser le filtre actuel
+            loadCustomers(currentFilterType,currentFilter, currentPage + 1, true); // Utiliser le filtre actuel
         }
     });
 });

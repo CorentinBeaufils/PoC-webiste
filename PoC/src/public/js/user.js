@@ -19,9 +19,11 @@ document.getElementById('createUserForm')?.addEventListener('submit', async (e) 
         const data = await response.json();
         if (response.ok) {
             document.getElementById('createMessage').textContent = 'Utilisateur créé avec succès.';
-            fetchUsers(); // Recharge la liste des utilisateurs
+            console.log('Utilisateur créé avec succès:', data);
+            await fetchUsers(); // Recharge la liste des utilisateurs
         } else {
             document.getElementById('createMessage').textContent = data.message || 'Erreur lors de la création de l\'utilisateur.';
+            console.error('Erreur lors de la création de l\'utilisateur:', data);
         }
     } catch (error) {
         document.getElementById('createMessage').textContent = 'Erreur lors de la création de l\'utilisateur.';
@@ -62,17 +64,6 @@ document.getElementById('deleteUserForm')?.addEventListener('submit', async (e) 
     }
 });
 
-// Fonction de déconnexion
-document.getElementById('logoutButton')?.addEventListener('click', () => {
-    fetch('/logout', { method: 'POST' })
-        .then(() => {
-            window.location.href = '/login';
-        })
-        .catch(error => {
-            console.error('Erreur lors de la déconnexion:', error);
-        });
-});
-
 // Fonction pour récupérer et afficher les utilisateurs
 async function fetchUsers() {
     try {
@@ -86,11 +77,10 @@ async function fetchUsers() {
         }
 
         const users = await response.json();
-        console.log("Utilisateurs reçus du serveur :", users); // Affiche les utilisateurs reçus du serveur
 
         const userList = document.getElementById('users');
         userList.innerHTML = ''; // Vide la liste actuelle des utilisateurs
-
+        console.log("Liste des utilisateurs :", users); // Affiche la liste des utilisateurs
         users.forEach(user => {
             const row = document.createElement('tr');
             row.innerHTML = `
@@ -180,4 +170,21 @@ async function deleteUser(email) {
 }
 
 // Appel de la fonction pour récupérer et afficher les utilisateurs au chargement de la page
-document.addEventListener('DOMContentLoaded', fetchUsers);
+document.addEventListener('DOMContentLoaded', function () {
+    fetchUsers();
+
+    const togglePassword = document.querySelector('#togglePassword');
+    const password = document.querySelector('#mot_de_passe');
+    const eyeOpen = document.querySelector('#eyeOpen');
+    const eyeClosed = document.querySelector('#eyeClosed');
+
+    togglePassword.addEventListener('click', function (e) {
+        e.preventDefault();
+        // Toggle the type attribute
+        const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+        password.setAttribute('type', type);
+        // Toggle the eye icons
+        eyeOpen.style.display = eyeOpen.style.display === 'none' ? 'block' : 'none';
+        eyeClosed.style.display = eyeClosed.style.display === 'none' ? 'block' : 'none';
+    });
+});

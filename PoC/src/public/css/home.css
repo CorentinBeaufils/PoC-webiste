@@ -1,0 +1,61 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding-top: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 300px;
+}
+
+p {
+    font-size: 12px;
+    color: #555;
+    margin: 5px;
+}
+
+.logo {
+    width: 80%;
+    /* Ajuste la largeur du logo */
+    max-width: 200px;
+    /* Taille maximale */
+    height: auto;
+    margin-bottom: 20px;
+}
+
+
+.user-info {
+    margin-top: 20px;
+}
+
+.user-info h1 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.user-info p {
+    font-size: 18px;
+    margin: 5px 0;
+}
+
+#sessionDuration {
+    margin-top: 20px;
+    font-size: 16px;
+    color: #555;
+}
+
+#separator {
+    width: 100%;
+    border-bottom: 1px solid #7a7a7a;
+    margin-bottom: 12px;
+}

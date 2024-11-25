@@ -46,20 +46,28 @@ router.post('/api/customers',verifierSession, async (req, res) => {
 
 // Route pour obtenir la liste de tous les clients avec pagination
 router.get('/api/customers', async (req, res) => {
-    const { company_name, page = 1, limit = 50 } = req.query;
+    const { filterType,company_name, page = 1, limit = 50 } = req.query;
+    console.log(req.query);
 
     try {
         const connection = await db.getConnection();
 
-        let query = 'SELECT * FROM companies';
+        let query = 'SELECT c.* FROM companies c';
         const queryParams = [];
 
-        if (company_name) {
-            query += ' WHERE company_name LIKE ?';
-            queryParams.push(`${company_name}%`);
+        if (filterType === 'name') {
+            query += ' WHERE c.company_name LIKE ?';
+            queryParams.push(`%${company_name}%`);
+        } else if (filterType === 'keyword') {
+            query += ' WHERE c.keyword LIKE ?';
+            queryParams.push(`%${company_name}%`);
+        } else if (filterType === 'contact') {
+            query += `
+                JOIN company_contacts ct ON c.id = ct.company_id
+                WHERE ct.name LIKE ?
+            `;
+            queryParams.push(`%${company_name}%`);
         }
-
-        query += ' LIMIT ? OFFSET ?';
         queryParams.push(parseInt(limit), (parseInt(page) - 1) * parseInt(limit));
 
         const [customers] = await connection.query(query, queryParams);
@@ -111,15 +119,15 @@ router.put('/api/customers/:id', async (req, res) => {
     console.log(`Requête de mise à jour reçue pour le client ID: ${customerId}`);
     console.log('Données mises à jour:', updatedData);
 
-    const { company_name, created_by } = updatedData;
+    const { company_name, created_by,keyword } = updatedData;
     console.log(company_name, created_by);
 
     try {
         const connection = await db.getConnection();
 
         const [result] = await connection.query(
-            'UPDATE companies SET company_name = ?, created_by = ? WHERE id = ?',
-            [company_name, created_by, customerId]
+            'UPDATE companies SET company_name = ?, created_by = ?,keyword = ? WHERE id = ?',
+            [company_name, created_by,keyword, customerId]
         );
 
         connection.release();

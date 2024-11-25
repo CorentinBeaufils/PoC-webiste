@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link rel="stylesheet" href="/css/home.css"> <!-- Assurez-vous du chemin vers le CSS -->
+    <link rel="stylesheet" href="/css/navbar.css">
+
+</head>
+
+<body>
+
+    <!-- Inclure la barre de navigation -->
+    <%- include('partials/navbar') %>
+    <div class="container">
+        <img src="/images/logo_amp.jpg" alt="Logo de l'entreprise" class="logo"> <!-- Assurez-vous du chemin vers le logo -->
+        <div>
+            <p>AisaMaterialProcess Limited</p>
+            <p>All rights reserved</p>
+        </div>
+        
+        <div id="separator"></div>
+        <div class="user-info">
+            <h1>Welcome, <%= user.nom %>!</h1>
+            <p>Email: <%= user.email %></p>
+            <p>Role: <%= user.role %></p>
+        </div>
+        <div id="separator"></div>
+        <div id="sessionDuration"></div> <!-- Conteneur pour la durée de la session -->
+    </div>
+
+    <script>
+        function calculateSessionDuration(startTime) {
+            const currentTime = Date.now();
+            const duration = currentTime - startTime;
+
+            // Convertir la durée en heures, minutes et secondes
+            const hours = Math.floor(duration / 3600000);
+            const minutes = Math.floor((duration % 3600000) / 60000);
+            const seconds = Math.floor((duration % 60000) / 1000);
+
+            return `${hours} hours, ${minutes} minutes and ${seconds} seconds`;
+        }
+
+        // Récupérer l'heure de début de la session depuis les données utilisateur
+        const startTime = <%= user.startTime %>;
+        const sessionDuration = calculateSessionDuration(startTime);
+
+        // Afficher la durée de la session
+        document.getElementById('sessionDuration').textContent = `Session duration: ${sessionDuration}`;
+    </script>
+</body>
+
+</html>

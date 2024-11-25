@@ -17,3 +17,14 @@ function myFunction() {
       }
     }
   }
+
+  //logout function
+document.getElementById('logoutButton')?.addEventListener('click', () => {
+  fetch('/logout', { method: 'POST' })
+      .then(() => {
+          window.location.href = '/login';
+      })
+      .catch(error => {
+          console.error('Erreur lors de la déconnexion:', error);
+      });
+});

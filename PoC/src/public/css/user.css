@@ -121,3 +121,23 @@ th {
     pointer-events: none;
     opacity: 0.5;
 }
+
+/* Styles pour le champ de mot de passe avec l'icône de l'œil */
+.password-container {
+    position: relative;
+}
+
+
+.toggle-password {
+    position: absolute;
+    right: 30px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    text-decoration: none;
+    color: #007bff;
+}
+
+.toggle-password:hover {
+    color: #0056b3;
+}
