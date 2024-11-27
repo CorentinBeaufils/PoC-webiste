@@ -6,17 +6,6 @@ body {
     padding-top: 60px;
 }
 
-/* Style des sections */
-.main-section {
-    width: 80vw;
-    max-width: 1600px;
-    background-color: #ffffff;
-    padding: 20px;
-    margin: 20px auto;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
 h2, h3 {
     font-size: 1.5em;
     margin-bottom: 15px;
@@ -152,7 +141,7 @@ button[type="submit"]:hover {
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     padding: 20px;
-    margin-bottom: 20px;
+    margin: 20px auto;
 }
 
 .customer-section h2, .customer-section h3 {

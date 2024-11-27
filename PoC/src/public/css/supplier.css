@@ -1,0 +1,190 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding-top: 60px;
+}
+
+/* Style pour la navigation interne de la page client */
+.supplier-nav {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.supplier-nav button {
+    background-color: #ffb73c;
+    color: black;
+    border: none;
+    padding: 10px 20px;
+    margin: 0 5px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s;
+}
+
+.supplier-nav button:hover {
+    background-color: #fad698;
+}
+
+
+
+.supplier-main-section {
+    width: 90%;
+    max-width: 1600px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin: 20px auto;
+}
+
+.supplier-main-section #separator {
+    margin-bottom: 12px;
+    border-bottom: 2px solid #8f6722;
+}
+
+.supplier-main-section h2, .supplier-main-section h3 {
+    color: #ffb73c;
+    margin-bottom: 15px;
+}
+
+.supplier-main-section form {
+    display: flex;
+    flex-direction: column;
+}
+
+.supplier-main-section input {
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.supplier-main-section label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+} 
+
+/* Submit button style */
+button[type="submit"] {
+    background-color: #28a745;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+button[type="submit"]:hover {
+    background-color: #218838;
+}
+
+/* Return button style */
+.return-button-container {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.return-button-container button {
+    background-color: #dc3545;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.return-button-container button:hover {
+    background-color: #c82333;
+}
+
+/* Style for the table */
+#supplierTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+/* Styles head of the table */
+#supplierTable thead th {
+    background-color: #000; /* Fond noir */
+    color: #fff; /* Police blanche */
+    padding: 10px; /* Espacement interne */
+    text-align: left; /* Alignement du texte à gauche */
+    border-bottom: 2px solid #ddd; /* Bordure inférieure */
+}
+
+/* Arrondir les coins de l'en-tête du tableau */
+#supplierTable thead th:first-child {
+    width: 80%;
+    border-top-left-radius: 10px; /* Coin supérieur gauche */
+}
+
+#supplierTable thead th:last-child {
+    border-top-right-radius: 10px; /* Coin supérieur droit */
+    width: 10%;
+}
+
+#supplierTable tbody tr td {
+    padding: 10px; /* Espacement interne */
+    border-bottom: 1px solid #ddd; /* Bordure inférieure */
+}
+
+/* Effet de survol pour les lignes */
+#supplierTable tbody tr:hover {
+    background-color: #f0f0f0 !important; /* Couleur de fond lors du survol */
+    cursor: pointer; /* Curseur en forme de main */
+}
+
+/* Couleurs alternées pour les lignes du tableau */
+#supplierTable tbody tr:nth-child(even) {
+    background-color: #f9f9f9; /* Couleur de fond pour les lignes paires */
+}
+
+#supplierTable tbody tr:nth-child(odd) {
+    background-color: #fff; /* Couleur de fond pour les lignes impaires */
+}
+
+/* filter style */
+.filter-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.filter-container select,
+.filter-container input[type="text"],
+.filter-container button {
+    padding: 10px;
+    margin: 0px 5px 0px 5px ;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.filter-container select {
+    width: 200px;
+}
+
+.filter-container input[type="text"] {
+    flex: 1;
+}
+
+.filter-container button {
+    background-color: #ffb73c;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+}
+
+.filter-container button:hover {
+    background-color: #d1a559;
+}

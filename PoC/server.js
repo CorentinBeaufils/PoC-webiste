@@ -10,6 +10,7 @@ import customerRoutes from './src/routes/customerRoutes.js'; // Chemin des route
 import db from './src/db.js'; // Assurez-vous du chemin correct
 import bodyParser from 'body-parser';
 import userRoutes from './src/routes/userRoutes.js'; // Assurez-vous que le chemin est correct
+import supplierRoutes from './src/routes/supplierRoutes.js'; // Assurez-vous que le chemin est correct
 
 dotenv.config();
 
@@ -44,6 +45,7 @@ app.use(express.static(path.join(__dirname, 'src/public')));
 
 app.use(customerRoutes);
 app.use(userRoutes);
+app.use(supplierRoutes);
 
 
 // Fonction keep-alive pour éviter la déconnexion
@@ -85,6 +87,10 @@ app.get('/user', verifierSession,verifierAdmin, (req, res) => {
 
 app.get('/customer',verifierSession, (req,res) => {
     res.render('customer', { user: req.session.user });
+});
+
+app.get('/supplier',verifierSession, (req,res) => {
+    res.render('supplier', { user: req.session.user });
 });
 
 app.get('/home', (req, res) => {

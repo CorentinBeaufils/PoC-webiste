@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supplier</title>
+    <link rel="stylesheet" href="/css/supplier.css">
+    <link rel="stylesheet" href="/css/navbar.css">
+</head>
+
+<body>
+<!-- Inclure la barre de navigation -->
+<%- include('partials/navbar') %>
+<!-- Menu de navigation pour basculer entre les sections -->
+<div class="supplier-nav">
+    <button onclick="showSection('createSupplier')">Create Supplier</button>
+    <button onclick="showSection('viewSuppliers')">Supplier List</button>
+    <button onclick="showSection('communications')">communications / notes</button>
+    <button onclick="showSection('orders')">Orders</button>
+</div>
+
+
+<section id="createSupplier" class="supplier-main-section">
+    <!-- create supplier section-->
+    <h2>Create Supplier</h2>
+    <div id="separator"></div>
+    <form id="createSupplierForm">
+        <label for="name">Name :</label>
+        <input type="text" id="name" name="name" required>
+        <label for="keywords">Keywords :</label>
+        <input type="text" id="keywords" name="keywords">
+        <button type="submit">Create Supplier</button>
+    </form>
+    <div id="separator"></div>
+    <div class="return-button-container">
+        <button>Return to Supplier List</button>
+    </div>
+</section>
+
+<section id="viewSuppliers" class="supplier-main-section">
+    <!-- view suppliers section-->
+    <h2>Supplier List</h2>
+    <div id="separator"></div>
+    <div class="filter-container">
+        <select id="filterType">
+            <option value="name">Filter by name</option>
+            <option value="keyword">Filter by keyword</option>
+            <option value="contact">Filter by contact</option>
+        </select>
+        <input type="text" id="filterValue" placeholder="Enter filter value">
+        <button onclick="filterSuppliers()">Filter</button>
+    </div>
+    <div id="separator"></div>
+    <table id="supplierTable">
+        <thead>
+            <tr>
+                <th>Supplier Name</th>
+                <th>Keywords</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="supplierTableBody">
+            <!-- Les lignes de fournisseurs seront ajoutées ici dynamiquement -->
+        </tbody>
+    </table>
+    <div id="separator"></div>
+    <div class="return-button-container">
+        <button>Return to Supplier List</button>
+    </div>
+</section>
+</body>
+    
+        <script src="/js/supplier.js"></script> <!-- Assurez-vous du chemin vers le JavaScript -->
+</html>
