@@ -1,28 +1,42 @@
-python check_compagmie_contact.py 
+python supplier_db_transfer.py 
+Nombre de lignes filtrées : 5419
 Traceback (most recent call last):
-  File "/home/amp-hk/PoC-webiste/PoC/myvenv/lib/python3.12/site-packages/pandas/core/indexes/base.py", line 3805, in get_loc
-    return self._engine.get_loc(casted_key)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "index.pyx", line 167, in pandas._libs.index.IndexEngine.get_loc
-  File "index.pyx", line 196, in pandas._libs.index.IndexEngine.get_loc
-  File "pandas/_libs/hashtable_class_helper.pxi", line 7081, in pandas._libs.hashtable.PyObjectHashTable.get_item
-  File "pandas/_libs/hashtable_class_helper.pxi", line 7089, in pandas._libs.hashtable.PyObjectHashTable.get_item
-KeyError: 'Company'
+  File "/home/amp-hk/PoC-webiste/db_analyse/venv/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 706, in cmd_query
+    self._cmysql.query(
+_mysql_connector.MySQLInterfaceError: Unknown column 'supplier_keywords' in 'field list'
 
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/home/amp-hk/PoC-webiste/db_analyse/check_compagmie_contact.py", line 69, in <module>
-    insert_contacts(input_file_path)
-  File "/home/amp-hk/PoC-webiste/db_analyse/check_compagmie_contact.py", line 38, in insert_contacts
-    cursor.execute('SELECT id FROM companies WHERE company_name = %s', (row['Company'],))
-                                                                        ~~~^^^^^^^^^^^
-  File "/home/amp-hk/PoC-webiste/PoC/myvenv/lib/python3.12/site-packages/pandas/core/series.py", line 1121, in __getitem__
-    return self._get_value(key)
-           ^^^^^^^^^^^^^^^^^^^^
-  File "/home/amp-hk/PoC-webiste/PoC/myvenv/lib/python3.12/site-packages/pandas/core/series.py", line 1237, in _get_value
-    loc = self.index.get_loc(label)
-          ^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/amp-hk/PoC-webiste/PoC/myvenv/lib/python3.12/site-packages/pandas/core/indexes/base.py", line 3812, in get_loc
-    raise KeyError(key) from err
-KeyError: 'Company
+  File "/home/amp-hk/PoC-webiste/db_analyse/supplier_db_transfer.py", line 52, in <module>
+    cursor.execute('''
+  File "/home/amp-hk/PoC-webiste/db_analyse/venv/lib/python3.12/site-packages/mysql/connector/cursor_cext.py", line 357, in execute
+    result = self._connection.cmd_query(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/amp-hk/PoC-webiste/db_analyse/venv/lib/python3.12/site-packages/mysql/connector/opentelemetry/context_propagation.py", line 97, in wrapper
+    return method(cnx, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/amp-hk/PoC-webiste/db_analyse/venv/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 714, in cmd_query
+    raise get_mysql_exception(
+mysql.connector.errors.ProgrammingError: 1054 (42S22): Unknown column 'supplier_keywords' in 'field list'
+(venv) amp-hk@amp-hk-Standard-PC-i440FX-PIIX-1996:~/PoC-webiste/db_analyse$ python supplier_db_transfer.py 
+Nombre de lignes filtrées : 5419
+Traceback (most recent call last):
+  File "/home/amp-hk/PoC-webiste/db_analyse/venv/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 706, in cmd_query
+    self._cmysql.query(
+_mysql_connector.MySQLInterfaceError: Unknown column 'nan' in 'field list'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/amp-hk/PoC-webiste/db_analyse/supplier_db_transfer.py", line 52, in <module>
+    cursor.execute('''
+  File "/home/amp-hk/PoC-webiste/db_analyse/venv/lib/python3.12/site-packages/mysql/connector/cursor_cext.py", line 357, in execute
+    result = self._connection.cmd_query(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/amp-hk/PoC-webiste/db_analyse/venv/lib/python3.12/site-packages/mysql/connector/opentelemetry/context_propagation.py", line 97, in wrapper
+    return method(cnx, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/amp-hk/PoC-webiste/db_analyse/venv/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 714, in cmd_query
+    raise get_mysql_exception(
+mysql.connector.errors.ProgrammingError: 1054 (42S22): Unknown column 'nan' in 'field list'
