@@ -21,7 +21,7 @@ def insert_contacts(file_path):
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS compagny_contacts (
             id INT AUTO_INCREMENT PRIMARY KEY,
-            company_id INT,
+            supplier_id INT,
             name VARCHAR(255),
             mobile VARCHAR(255),
             contact_function VARCHAR(255),

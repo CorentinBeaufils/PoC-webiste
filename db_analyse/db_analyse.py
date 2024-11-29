@@ -1,13 +1,13 @@
 import pandas as pd
 
 # Chemin vers votre fichier Excel
-file_path = 'C:/Users/trice/Documents/sf8custommerdb.xlsx'  # Remplacez par le chemin de votre fichier
+file_path = 'C:/Users/trice/Documents/supplierMain.xlsx'  # Remplacez par le chemin de votre fichier
 
 # Lire le fichier Excel
 df = pd.read_excel(file_path)
 
 # Nom de la colonne à vérifier pour les redondances
-column_name = 'Customer::Company_1_et_2'  # Remplacez par le nom de votre colonne
+column_name = 'Supplier::Supplier 1'  # Remplacez par le nom de votre colonne
 
 # Exclure les champs vides
 df_non_empty = df[df[column_name].notna() & (df[column_name] != '')]

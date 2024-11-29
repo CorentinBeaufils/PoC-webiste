@@ -1,14 +1,14 @@
 import pandas as pd
 
 # Chemin vers votre fichier Excel
-file_path = 'C:/Users/trice/Documents/sf8custommerdb.xlsx'
+file_path = 'C:/Users/trice/Documents/supplierMain.xlsx'
 
 # Lire le fichier Excel
 df = pd.read_excel(file_path)
 
 # Noms des colonnes à comparer
-column1 = 'Customer_Main_Address_Number::Number_Type'  # Remplacez par le nom de la première colonne
-column2 = 'Customer_Number::Number_Type'  # Remplacez par le nom de la deuxième colonne
+column1 = 'Supplier::Creation date'  # Remplacez par le nom de la première colonne
+column2 = 'Supplier::Supplier 1'  # Remplacez par le nom de la deuxième colonne
 
 # Vérifier si les colonnes existent dans le DataFrame
 if column1 not in df.columns or column2 not in df.columns:
