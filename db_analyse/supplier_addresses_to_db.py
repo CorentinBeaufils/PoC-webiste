@@ -7,6 +7,13 @@ file_path = 'C:/Users/trice/Documents/supplier_all_addresses.xlsx'
 # Lire le fichier Excel
 df = pd.read_excel(file_path, usecols=['Type', 'Address', 'Company'])
 
+# Remplacer les valeurs NaN par des chaînes vides ou des valeurs par défaut
+df = df.fillna({
+    'Type': '',
+    'Address': '',
+    'Company': ''
+})
+
 # Connexion à la base de données MySQL
 conn = mysql.connector.connect(
     host='127.0.0.1',  # Remplacez par votre hôte MySQL
@@ -16,7 +23,7 @@ conn = mysql.connector.connect(
 )
 cursor = conn.cursor()
 
-# Créer la table company_addresses si elle n'existe pas déjà
+# Créer la table supplier_addresses si elle n'existe pas déjà
 cursor.execute('''
     CREATE TABLE IF NOT EXISTS supplier_addresses (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -27,12 +34,11 @@ cursor.execute('''
     )
 ''')
 
-# Insérer les données dans la table company_addresses
+# Insérer les données dans la table supplier_addresses
 for index, row in df.iterrows():
     # Récupérer l'identifiant de la compagnie
-    cursor.execute('SELECT id FROM suppliers WHERE supplier_name like %s', ('%' + row['Company'] + '%',))
+    cursor.execute('SELECT id FROM suppliers WHERE supplier_name LIKE %s', ('%' + row['Company'] + '%',))
     result = cursor.fetchone()
-    cursor.fetchall()
     if result:
         company_id = result[0]
         cursor.execute('''
@@ -47,4 +53,4 @@ conn.commit()
 cursor.close()
 conn.close()
 
-print("Les données ont été insérées dans la table 'company_addresses'.")
+print("Les données ont été insérées dans la table 'supplier_addresses'.")
