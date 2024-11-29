@@ -1,0 +1,14 @@
+<div id="editSupplierDetailsModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal('editSupplierDetailsModal')">&times;</span>
+        <h3>Edit Supplier Details</h3>
+        <div id="separator"></div>
+        <form id="supplierDetailsForm" action="/api/suppliers/<%= supplier.id %>" method="POST">
+            <label for="supplier_name">Name:</label>
+            <input type="text" id="supplier_name" name="supplier_name" value="<%= supplier.supplier_name %>">
+            <label for="supplier_keywords">Keywords:</label>
+            <input type="text" id="supplier_keywords" name="supplier_keywords" value="<%= supplier.supplier_keywords %>">
+            <button type="submit">Save Changes</button>
+        </form>
+    </div>
+</div>

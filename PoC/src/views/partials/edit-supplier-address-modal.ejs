@@ -1,0 +1,16 @@
+<div id="editAddressModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal('editAddressModal')">&times;</span>
+        <h3 id = "addressModalTitle">Edit Address</h3>
+        <div id="separator"></div>
+        <form id="addressForm" onsubmit="submitForm(event)">
+            <input type="hidden" id="supplier_id" name="supplier_id" value="<%= supplier.id %>">
+            <input type="hidden" id="address_id" name="address_id">
+            <label for="address_type">Type:</label>
+            <input type="text" id="address_type" name="type">
+            <label for="address_value">Address:</label>
+            <input type="text" id="address_value" name="address">
+            <button type="submit" id="addressFormButton">Save Changes</button>
+        </form>
+    </div>
+</div>

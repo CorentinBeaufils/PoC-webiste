@@ -1,0 +1,18 @@
+<div id="editContactMethodModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal('editContactMethodModal')">&times;</span>
+        <h3 id="ContactMethodModalTitle">Edit Contact Method</h3>
+        <div id="separator"></div>
+        <form id="contactMethodForm" onsubmit="submitForm(event)">
+            <input type="hidden" id="supplier_id" name="supplier_id" value="<%= supplier.id %>">
+            <input type="hidden" id="contact_method_id" name="contact_method_id">
+            <label for="contact_method_type">Type:</label>
+            <input type="text" id="contact_method_type" name="contact_type">
+            <label for="contact_method_value">Value:</label>
+            <input type="text" id="contact_method_value" name="contact_value">
+            <label for="contact_method_address_type">Address Type:</label>
+            <input type="text" id="contact_method_address_type" name="address_type">
+            <button type="submit" id="contactMethodFormButton">Save Changes</button>
+        </form>
+    </div>
+</div>

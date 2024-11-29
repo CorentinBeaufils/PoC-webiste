@@ -29,16 +29,15 @@ async function loadSuppliers(page = 1, filterType = '', filterValue = '') {
                 <td>${supplier.supplier_name}</td>
                 <td>${supplier.supplier_keywords}</td>
                 <td>
-                    <button class="delete-button">Delete</button>
+                    <button class="deleteButton">Delete</button>
                 </td>
             `;
             row.addEventListener('click', () => {
-                row.classList.add('selected');
                 selectedRow = row;
                 window.location.href = `/edit-supplier/${supplier.id}`;
             });
             // Ajouter un gestionnaire d'événements pour le bouton "Delete"
-            const deleteButton = row.querySelector('.delete-button');
+            const deleteButton = row.querySelector('.deleteButton');
             deleteButton.addEventListener('click', (event) => {
                 event.stopPropagation(); // Empêcher la propagation de l'événement de clic
                 deleteSupplier(supplier.id);
@@ -55,16 +54,22 @@ async function loadSuppliers(page = 1, filterType = '', filterValue = '') {
 }
 
 async function deleteSupplier(supplierId) {
+    // Afficher une alerte de confirmation
+    const confirmation = confirm('Are you sure you want to delete this supplier?');
+    if (!confirmation) {
+        return; // Si l'utilisateur annule, ne pas continuer
+    }
+
     try {
         const response = await fetch(`/api/suppliers/${supplierId}`, {
             method: 'DELETE'
         });
+        await response;
         if (!response.ok) {
             throw new Error('Erreur lors de la suppression du fournisseur.');
         }
         console.log(`Fournisseur avec l'ID ${supplierId} supprimé.`);
-        // Recharger la liste des fournisseurs après la suppression
-        loadSuppliers(1);
+        location.reload(); // Recharger la page après la suppression
     } catch (error) {
         console.error('Erreur lors de la suppression du fournisseur:', error);
     }
@@ -76,6 +81,35 @@ function filterSuppliers() {
     currentPage = 1;
     hasMoreSuppliers = true;
     loadSuppliers(currentPage, filterType, filterValue);
+}
+
+async function submitSupplierForm(event) {
+    event.preventDefault();
+
+    const form = event.target;
+    const formData = new FormData(form);
+    try {
+        const response = await fetch('/api/suppliers', {
+            method: 'POST',
+            body: JSON.stringify(Object.fromEntries(formData)),
+            headers: {
+                'Content-Type': 'application/json',
+                'credentials': 'same-origin'
+            }
+        });
+        const result = await response.json();
+        if (response.ok) {
+            alert('Supplier created successfully');
+            console.log('response:', result);
+            window.location.href = `/edit-supplier/${result.supplierId}`;
+        } else {
+            alert('Failed to create supplier.');
+        }
+    }
+    catch (error) {
+        console.error('Erreur lors de la création du client:', error);
+        alert('Erreur lors de la création du client');
+    }
 }
 
 // Charger les fournisseurs initiaux

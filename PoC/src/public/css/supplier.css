@@ -5,7 +5,7 @@ body {
     padding-top: 60px;
 }
 
-/* Style pour la navigation interne de la page client */
+/* Style for the internal navigation of the client page */
 .supplier-nav {
     display: flex;
     justify-content: center;
@@ -27,8 +27,6 @@ body {
 .supplier-nav button:hover {
     background-color: #fad698;
 }
-
-
 
 .supplier-main-section {
     width: 90%;
@@ -112,47 +110,47 @@ button[type="submit"]:hover {
     margin-top: 20px;
 }
 
-/* Styles head of the table */
+/* Styles for the table header */
 #supplierTable thead th {
-    background-color: #000; /* Fond noir */
-    color: #fff; /* Police blanche */
-    padding: 10px; /* Espacement interne */
-    text-align: left; /* Alignement du texte à gauche */
-    border-bottom: 2px solid #ddd; /* Bordure inférieure */
+    background-color: #000; /* Black background */
+    color: #fff; /* White text */
+    padding: 10px; /* Internal padding */
+    text-align: left; /* Left text alignment */
+    border-bottom: 2px solid #ddd; /* Bottom border */
 }
 
-/* Arrondir les coins de l'en-tête du tableau */
+/* Round the corners of the table header */
 #supplierTable thead th:first-child {
     width: 80%;
-    border-top-left-radius: 10px; /* Coin supérieur gauche */
+    border-top-left-radius: 10px; /* Top left corner */
 }
 
 #supplierTable thead th:last-child {
-    border-top-right-radius: 10px; /* Coin supérieur droit */
+    border-top-right-radius: 10px; /* Top right corner */
     width: 10%;
 }
 
 #supplierTable tbody tr td {
-    padding: 10px; /* Espacement interne */
-    border-bottom: 1px solid #ddd; /* Bordure inférieure */
+    padding: 10px; /* Internal padding */
+    border-bottom: 1px solid #ddd; /* Bottom border */
 }
 
-/* Effet de survol pour les lignes */
+/* Hover effect for rows */
 #supplierTable tbody tr:hover {
-    background-color: #f0f0f0 !important; /* Couleur de fond lors du survol */
-    cursor: pointer; /* Curseur en forme de main */
+    background-color: #f0f0f0 !important; /* Background color on hover */
+    cursor: pointer; /* Pointer cursor */
 }
 
-/* Couleurs alternées pour les lignes du tableau */
+/* Alternate colors for table rows */
 #supplierTable tbody tr:nth-child(even) {
-    background-color: #f9f9f9; /* Couleur de fond pour les lignes paires */
+    background-color: #f9f9f9; /* Background color for even rows */
 }
 
 #supplierTable tbody tr:nth-child(odd) {
-    background-color: #fff; /* Couleur de fond pour les lignes impaires */
+    background-color: #fff; /* Background color for odd rows */
 }
 
-/* filter style */
+/* Filter style */
 .filter-container {
     display: flex;
     align-items: center;
@@ -164,7 +162,7 @@ button[type="submit"]:hover {
 .filter-container input[type="text"],
 .filter-container button {
     padding: 10px;
-    margin: 0px 5px 0px 5px ;
+    margin: 0px 5px 0px 5px;
     border: 1px solid #ddd;
     border-radius: 5px;
     font-size: 16px;
@@ -187,4 +185,281 @@ button[type="submit"]:hover {
 
 .filter-container button:hover {
     background-color: #d1a559;
+}
+
+.supplier-details {
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+.supplier-details p {
+    margin: 5px 0;
+}
+
+/*/////////////////////////////////////////////////////////////////////// */
+/* Modal styles */
+
+.modal {
+    display: none; /* Hide modals by default */
+    position: fixed; /* Position modals fixed */
+    z-index: 1000; /* Ensure modals appear above other elements */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto; /* Enable scrolling if necessary */
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+}
+
+/* Styles for modal content */
+.modal-content {
+    background-color: #fff;
+    margin: 10% auto; /* Center content vertically and horizontally */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; /* Content width */
+    max-width: 600px; /* Maximum content width */
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* Box shadow */
+}
+
+/* Styles for the close button */
+.modal .close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.modal .close:hover,
+.modal .close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Styles for forms in modals */
+.modal form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.modal form label {
+    margin-top: 10px;
+}
+
+.modal form input[type="text"],
+.modal form input[type="email"],
+.modal form input[type="tel"],
+.modal form textarea {
+    width: auto;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.modal form button {
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #28a745;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.modal form button:hover {
+    background-color: #218838;
+}
+
+.modal h3 {
+    color: #ffb73c;
+    margin-top: 10;
+}
+
+
+/* /////////////////////////////////////////////////////////////////////// */
+/* edit-button style */
+.editButton {
+    background-color: #007bff;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    width: 100%;
+}
+.editButton:hover {
+    background-color: #0056b3;
+}
+
+/* /////////////////////////////////////////////////////////////////////// */
+/* deleteButton style */
+
+.deleteButton {
+    background-color: #dc3545;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 5px; /* Espacement entre les boutons */
+    width: 100%;
+}
+.deleteButton:hover {
+    background-color: #c82333;
+}
+
+/* /////////////////////////////////////////////////////////////////////// */
+/* edit contact section style */
+.supplier-contacts {
+    margin-top: 20px;
+}
+
+.contacts-table {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.contacts-header {
+    display: flex;
+    background-color: #ebb076;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.contacts-body {
+    max-height: 200px; /* Hauteur maximale pour activer le défilement */
+    overflow-y: auto; /* Activer le défilement vertical */
+}
+
+.contacts-row {
+    display: flex;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.contacts-cell {
+    flex: 1;
+    padding: 5px;
+}
+
+.contacts-cell:last-child {
+    flex: 0 0 100px; /* Largeur fixe pour la colonne des actions */
+}
+
+.contacts-row:nth-child(even) {
+    background-color: #f9f9f9; /* Couleur de fond pour les lignes paires */
+}
+
+.contacts-row:hover {
+    background-color: #f0f0f0; /* Couleur de fond lors du survol */
+}
+
+/* /////////////////////////////////////////////////////////////////////// */
+/* edit address section style */
+/* Styles pour la section des adresses */
+.supplier-addresses {
+    margin-top: 20px;
+}
+
+.addresses-table {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.addresses-header {
+    display: flex;
+    background-color: #ebb076;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.addresses-body {
+    max-height: 200px; /* Hauteur maximale pour activer le défilement */
+    overflow-y: auto; /* Activer le défilement vertical */
+}
+
+.addresses-row {
+    display: flex;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.addresses-cell {
+    flex: 1;
+    padding: 5px;
+}
+
+.addresses-cell:last-child {
+    flex: 0 0 100px; /* Largeur fixe pour la colonne des actions */
+}
+
+.addresses-row:nth-child(even) {
+    background-color: #f9f9f9; /* Couleur de fond pour les lignes paires */
+}
+
+.addresses-row:hover {
+    background-color: #f0f0f0; /* Couleur de fond lors du survol */
+}
+
+/* /////////////////////////////////////////////////////////////////////// */
+/* edit contact methods section style */
+.supplier-contact-methods {
+    margin-top: 20px;
+}
+
+.contact-methods-table {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.contact-methods-header {
+    display: flex;
+    background-color: #ebb076;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.contact-methods-body {
+    max-height: 200px; /* Hauteur maximale pour activer le défilement */
+    overflow-y: auto; /* Activer le défilement vertical */
+}
+
+.contact-methods-row {
+    display: flex;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.contact-methods-cell {
+    flex: 1;
+    padding: 5px;
+}
+
+.contact-methods-cell:last-child {
+    flex: 0 0 100px; /* Largeur fixe pour la colonne des actions */
+}
+
+.contact-methods-row:nth-child(even) {
+    background-color: #f9f9f9; /* Couleur de fond pour les lignes paires */
+}
+
+.contact-methods-row:hover {
+    background-color: #f0f0f0; /* Couleur de fond lors du survol */
 }

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Supplier</title>
+    <link rel="stylesheet" href="/css/supplier.css"> <!-- Assurez-vous du chemin vers le CSS -->
+    <link rel="stylesheet" href="/css/navbar.css"> <!-- Assurez-vous du chemin vers le CSS -->
+</head>
+
+<body>
+    <%- include('partials/navbar') %>
+
+    <section id="editSupplier" class="supplier-main-section">
+        <h2>Edit Supplier</h2>
+        <div id="separator"></div>
+        
+        <!-- Section pour les détails du fournisseur -->
+        <div class="supplier-details">
+            <h3>Supplier Details</h3>
+            <p><strong>Name:</strong> <%= supplier.supplier_name %></p>
+            <p><strong>Created By:</strong> <%= supplier.created_by %></p>
+            <p><strong>Creation Date:</strong> <span id="creationDate"><%= supplier.creation_date.toISOString().split('T')[0] %></span></p>
+            <p><strong>Keywords:</strong> <%= supplier.supplier_keywords %></p>
+            <button onclick="openModal('editSupplierDetailsModal')" class="editButton">Edit</button>
+        </div>
+        
+        <!-- Section pour les adresses du fournisseur -->
+        <div class="supplier-addresses">
+            <h3>Addresses</h3>
+            <div class="addresses-table">
+                <div class="addresses-header">
+                    <div class="addresses-cell"><strong>Type</strong></div>
+                    <div class="addresses-cell"><strong>Address</strong></div>
+                    <div class="addresses-cell"><strong>Action</strong></div>
+                </div>
+                <div class="addresses-body">
+                    <% addresses.forEach(address => { %>
+                        <div class="addresses-row">
+                            <div class="addresses-cell"><%= address.type %></div>
+                            <div class="addresses-cell"><%= address.address %></div>
+                            <div class="addresses-cell">
+                                <button onclick="openModal('editAddressModal', <%= address.id %>)" class="editButton">Edit</button>
+                                <button onclick="deleteAddress(<%= address.id %>)" class="deleteButton">Delete</button>
+                            </div>
+                        </div>
+                    <% }) %>
+                </div>
+            </div>
+            <button onclick="openModal('editAddressModal')">Add New Address</button>
+        </div>
+        
+        <!-- Section pour les contacts du fournisseur -->
+        <div class="supplier-contacts">
+            <h3>Contacts</h3>
+            <div class="contacts-table">
+                <div class="contacts-header">
+                    <div class="contacts-cell"><strong>Name</strong></div>
+                    <div class="contacts-cell"><strong>Mobile</strong></div>
+                    <div class="contacts-cell"><strong>Email</strong></div>
+                    <div class="contacts-cell"><strong>Action</strong></div>
+                </div>
+                <div class="contacts-body">
+                    <% contacts.forEach(contact => { %>
+                        <div class="contacts-row">
+                            <div class="contacts-cell"><%= contact.name %></div>
+                            <div class="contacts-cell"><%= contact.mobile %></div>
+                            <div class="contacts-cell"><%= contact.email %></div>
+                            <div class="contacts-cell">
+                                <button onclick="openModal('editContactModal', <%= contact.id %>)" class="editButton">Edit</button>
+                                <button onclick="deleteContact(<%= contact.id %>)" class="deleteButton">Delete</button>
+                            </div>
+                        </div>
+                    <% }) %>
+                </div>
+            </div>
+            <button onclick="openModal('addContactModal')">Add a Contact</button>
+        </div>
+        
+        <!-- Section pour les méthodes de contact du fournisseur -->
+        <div class="supplier-contact-methods">
+            <h3>Contact Methods</h3>
+            <div class="contact-methods-table">
+                <div class="contact-methods-header">
+                    <div class="contact-methods-cell"><strong>Type</strong></div>
+                    <div class="contact-methods-cell"><strong>Value</strong></div>
+                    <div class="contact-methods-cell"><strong>Address Type</strong></div>
+                    <div class="contact-methods-cell"><strong>Action</strong></div>
+                </div>
+                <div class="contact-methods-body">
+                    <% contactMethods.forEach(method => { %>
+                        <div class="contact-methods-row">
+                            <div class="contact-methods-cell"><%= method.contact_type %></div>
+                            <div class="contact-methods-cell"><%= method.contact_value %></div>
+                            <div class="contact-methods-cell"><%= method.address_type %></div>
+                            <div class="contact-methods-cell">
+                                <button onclick="openModal('editContactMethodModal', <%= method.id %>)" class="editButton">Edit</button>
+                                <button onclick="deleteContactMethod(<%= method.id %>)" class="deleteButton">Delete</button>
+                            </div>
+                        </div>
+                    <% }) %>
+                </div>
+            </div>
+            <button onclick="openModal('addContactMethodModal')">Add a Communication Method</button>
+        </div>
+        
+        <div id="separator"></div>
+        <div class="return-button-container">
+            <button onclick="window.location.href='/supplier'">Return to Supplier List</button>
+        </div>
+    </section>
+
+    <!-- Inclure les modals -->
+    <%- include('partials/edit-supplier-details-modal') %>
+    <%- include('partials/edit-supplier-address-modal') %>
+    <%- include('partials/edit-supplier-contact-modal') %>
+    <%- include('partials/edit-supplier-contact-method-modal') %>
+
+    <!-- Passer les données du serveur au client -->
+    <script>
+        window.supplierData = {
+            addresses: <%- JSON.stringify(addresses) %>,
+            contacts: <%- JSON.stringify(contacts) %>,
+            contactMethods: <%- JSON.stringify(contactMethods) %>
+        };
+    </script>
+    <script src="/js/edit-supplier.js"></script>
+</body>
+
+</html>
