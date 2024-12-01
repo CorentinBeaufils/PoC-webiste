@@ -8,13 +8,13 @@ async function loadSuppliers(page = 1, filterType = '', filterValue = '') {
     isLoading = true;
 
     try {
-        const response = await fetch(`/api/suppliers?page=${page}&limit=10&filterType=${filterType}&filterValue=${filterValue}`);
+        const response = await fetch(`/api/suppliers?page=${page}&limit=20&filterType=${filterType}&filterValue=${filterValue}`);
         if (!response.ok) {
             throw new Error('Erreur lors du chargement des fournisseurs.');
         }
 
         const suppliers = await response.json();
-        if (suppliers.length < 10) {
+        if (suppliers.length < 20) {
             hasMoreSuppliers = false; // Arrêter le lazy loading s'il n'y a plus de fournisseurs
         }
 

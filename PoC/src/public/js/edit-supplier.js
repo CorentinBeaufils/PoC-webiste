@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function openModal(modalId, itemId = null) {
     const modal = document.getElementById(modalId);
+    console.log('modalId:', modalId);
     if (modal) {
         modal.style.display = 'block';
 
@@ -73,6 +74,7 @@ function openModal(modalId, itemId = null) {
                 document.getElementById('addressForm').dataset.method = 'POST';
                 document.getElementById('addressForm').dataset.url = '/api/supplier-addresses';
             } else if (modalId === 'editContactModal') {
+                console.log('editContactModal');
                 document.getElementById('contact_id').value = '';
                 document.getElementById('contact_name').value = '';
                 document.getElementById('contact_mobile').value = '';
