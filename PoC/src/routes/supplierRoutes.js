@@ -6,18 +6,19 @@ import { verifierSession, verifierAdmin } from '../middleware/authMiddleware.js'
 
 // Route pour obtenir la liste des fournisseurs avec pagination et filtrage
 router.get('/api/suppliers',verifierSession, async (req, res) => {
-    const { page = 1, limit = 10, filterType, filterValue } = req.query;
-
+    const { page = 1, limit = 20, filterType, filterValue } = req.query;
+    console.log('Page:', page, 'Limit:', limit);
     // Convertir les valeurs de page et limit en entiers
     const pageInt = parseInt(page, 10);
     const limitInt = parseInt(limit, 10);
+    
 
     // Validation des valeurs de page et limit
     if (isNaN(pageInt) || pageInt < 1) {
         pageInt = 1;
     }
     if (isNaN(limitInt) || limitInt < 1) {
-        limitInt = 10;
+        limitInt = 20;
     }
 
     try {
@@ -45,7 +46,7 @@ router.get('/api/suppliers',verifierSession, async (req, res) => {
         queryParams.push(limitInt, offset);
 
         const [suppliers] = await db.query(query, queryParams);
-
+        console.log('Suppliers retrieved:', suppliers.length);
         res.json(suppliers);
     } catch (error) {
         console.error('Erreur lors de la récupération des fournisseurs:', error);

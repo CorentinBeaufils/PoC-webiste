@@ -23,7 +23,7 @@
             <p><strong>Created By:</strong> <%= supplier.created_by %></p>
             <p><strong>Creation Date:</strong> <span id="creationDate"><%= supplier.creation_date.toISOString().split('T')[0] %></span></p>
             <p><strong>Keywords:</strong> <%= supplier.supplier_keywords %></p>
-            <button onclick="openModal('editSupplierDetailsModal')" class="editButton">Edit</button>
+            <button onclick="openModal('editSupplierDetailsModal')" class="addButton">Edit</button>
         </div>
         
         <!-- Section pour les adresses du fournisseur -->
@@ -48,7 +48,7 @@
                     <% }) %>
                 </div>
             </div>
-            <button onclick="openModal('editAddressModal')">Add New Address</button>
+            <button onclick="openModal('editAddressModal')" class="addButton">Add New Address</button>
         </div>
         
         <!-- Section pour les contacts du fournisseur -->
@@ -75,7 +75,7 @@
                     <% }) %>
                 </div>
             </div>
-            <button onclick="openModal('addContactModal')">Add a Contact</button>
+            <button onclick="openModal('editContactModal')" class="addButton">Add a Contact</button>
         </div>
         
         <!-- Section pour les méthodes de contact du fournisseur -->
@@ -102,7 +102,7 @@
                     <% }) %>
                 </div>
             </div>
-            <button onclick="openModal('addContactMethodModal')">Add a Communication Method</button>
+            <button onclick="openModal('editContactMethodModal')" class="addButton">Add a Communication Method</button>
         </div>
         
         <div id="separator"></div>
